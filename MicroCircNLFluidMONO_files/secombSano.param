@@ -1,0 +1,89 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% parameters for program laplacian                                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%MESH_FILE  =  '/home/labuser/Documents/Laura/Meshes/rat93bAdimRaiFitta.msh';    %  rat93bAdimAdatRai.msh rat93bAdimAdatRai.msh(sano)  (malato)  % mesh file  rat93bAdimAdatRaiPerProva.msh
+MESH_FILE =  '/home/labuser/Documents/Laura/Meshes/MeshxTC/rat93blc025.msh'; 
+
+MESH_TYPET  = 'GT_PK(3,1)';                              % 3D type mesh
+MESH_TYPEV  = 'GT_PK(1,1)';                              % 1D type mesh
+
+%LINE_FILEF = '/home/labuser/Documents/Laura/Matlab/Secomb/rat93PittPmoved.pts';   % rat93PittP.pts
+LINE_FILEF = '/home/labuser/Documents/Laura/Matlab/Secomb/filexTC/rat93bh150P.pts';
+
+
+FEM_TYPET = 'FEM_PK(3,1)';                              % P1 for tissue 3D domain
+FEM_TYPEV = 'FEM_PK(1,1)';                              % P1 for tissue 1D domain
+
+INTEGRATION_T = 'IM_TETRAHEDRON(3)'; 
+INTEGRATION_V = 'IM_GAUSS1D(3)'; 
+
+%%%%%%%%%%%%%%% Algorithm information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+NInt = 50;
+MAX_SUBITERF = 100;
+SOLVE_METHOD_T = 'GMRES'
+SOLVE_METHOD_V = 'GMRES';
+SOLVE_METHOD_M = 'GMRES';
+
+
+%%%%%%%%%%%%%%% Constants %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+RESIDU = 1E-16;     	% residu for conjugate gradient.
+GAMMA  = 2.0e1;         % Penalization term
+OMEGA1 = 0.5;
+OMEGA2 = 0.5;
+PECLET = 0.5;
+RADIUS = 0.1528; %rat93b
+VOLT   = 148;
+VOLV   = 34.7;
+
+velT   = -2.0e-5;
+velV   = -36.4810;
+
+
+%%%%%%%%%%%%%%% Time %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+TFINAL = 1.0;  
+DT     = 1.0E21;
+
+
+%%%%%%%%%%%%% Constants for non linear terms %%%%%%%%%%%%%%%%%%
+alphaF  = 0.0;
+Cm = 1.0;
+
+ApresF = 9.6007e-7;
+BpresF = 0.0;
+AconcF = 0.0;
+BconcF = 0.0;
+
+%%%%%%%%%%%%% Fluid coefficients %%%%%%%%%%%%%%%%%%
+
+CtF = 0.0
+KtF=2.0e-5; %rat93b
+MtF = 5.2088e-5;  %  %TERMINE LINFATICO!  %0.0
+RtF = 0.0;
+
+CvF = 0.0;
+KvF = 2.6759;  %rat93b
+MvF = 0.0;
+RvF = 0.0;
+
+
+%%%% BC for FLUID problem: *****************************************
+
+NumberOfBCF      = 2;
+
+BCF0Type         = 'DIR';
+BCF0Label        = 0;
+BCF0Pressure     = 0.0; 
+
+BCF1Type         = 'NEU';
+BCF1Label        = 1;
+BCF1Flux         = 0.0;
+
+
+%%%%% Output directory *******************************************
+
+OutputDir = 'Vtk/Secomb93b';
+
+
