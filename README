@@ -1,0 +1,8 @@
+Cmpilato con 
+
+getfem 4.2 (mumps e boost support)
+boost 1.57
+
+gcc 4.9
+
+Non funziona con getfem4.3 (segmeentation error). Da investigare perche`.

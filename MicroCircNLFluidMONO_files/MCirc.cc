@@ -67,9 +67,9 @@
 #include <getfem/getfem_derivatives.h>
 
 
-#include "utilities.cc"          // finite element operators
-#include "import_gmshv2.cc"         // the .neu mesh reader
-#include "import_network.cc"     // the importer for the network
+#include "utilities.hpp"          // finite element operators
+#include "import_gmshv2.hpp"         // the .neu mesh reader
+#include "import_network.hpp"     // the importer for the network
 
 using std::endl; using std::cout; using std::cerr;
 using std::ends; using std::cin;
