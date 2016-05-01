@@ -1,0 +1,18 @@
+# ====================================================================
+#   "Mixed Finite Element Methods for Coupled 3D/1D Fluid Problems"
+#      Course on Advanced Programming for Scientific Computing
+#                     Politecnico di Milano
+#                         A.Y. 2014-2015
+#
+#                    Copyright D. Notaro 2015
+# ====================================================================
+#   FILE        : README
+#   DESCRIPTION : Description of primal/ content
+#   AUTHOR      : Domenico Notaro <domenico.not@gmail.com>
+#   DATE        : February 2016
+# ====================================================================
+Code by Laura Cattaneo <laura.cattaneo1@polimi.it>
+
+It has been the starting point for the current project.
+It implements the primal formulation of the model.
+Used in test-case 4_primalmixed to validate the mixed model.

@@ -1,0 +1,93 @@
+%======================================================================
+%   "Mixed Finite Element Methods for Coupled 3D/1D Fluid Problems"
+%       Course on Advanced Programming for Scientific Computing
+%                     Politecnico di Milano
+%                         A.Y. 2014-2015
+%                 
+%               Copyright (C) 2015 Domenico Notaro
+%======================================================================
+%	FILE        : input.param
+%  DESCRIPTION : List of parameters for the CSF flow problem
+%	AUTHOR      : Domenico Notaro <domenico.not@gmail.com>
+%	DATE        : January 2016
+%======================================================================
+
+%  FLAGS
+%===================================
+% Flag to import dimensionless param
+TEST_PARAM = 0;
+% Flag to export results
+VTK_EXPORT = 1;
+% Output directory
+OUTPUT     = 'vtk/';
+%===================================
+%  MESH
+%===================================
+% Flags to build a regular 3d mesh
+TEST_GEOMETRY = 1;
+GT_T       = 'GT_PK(3,1)'; 
+NSUBDIV_T  = '[11,11,11]';  
+ORG_T      = '[0,0,0]'; 
+SIZES_T    = '[1,1,1]';  
+NOISED_T   = '0';
+% Path to import the 3d mesh
+MESH_FILET = ' '; 
+% Path to import the 1d list of points
+MESH_FILEV = '/home/nico/workspace/pacs/model3d1d/src/5_CSF/network_a.pts';  
+
+%===================================
+%  GETFEM DESCRIPTORS
+%===================================
+% GetFem type for the 3D mesh
+MESH_TYPET  = 'GT_PK(3,1)';   
+% GetFem type for the 1D mesh
+MESH_TYPEV  = 'GT_PK(1,1)';        
+% GetFem type for the 3D Finite Element Methods
+FEM_TYPET   = 'FEM_RT0(3)';
+FEM_TYPET_P = 'FEM_PK_DISCONTINUOUS(3,0)';
+FEM_TYPET_DATA = 'FEM_PK(3,0)';
+% GetFem type for the 1D Finite Element Methods
+FEM_TYPEV   = 'FEM_PK(1,1)';  
+FEM_TYPEV_P = 'FEM_PK(1,0)';  
+FEM_TYPEV_DATA = 'FEM_PK(1,0)';  
+% GetFem type for the 3D Integration Method
+IM_TYPET    = 'IM_TETRAHEDRON(6)'; 
+% GetFem type for the 1D Integration Method
+IM_TYPEV    = 'IM_GAUSS1D(6)'; 
+% Solver for the monolithic 3D/1D linear system
+% direct:    'SuperLU'
+% iterative: 'CG','BiCGstab','GMRES','QMR','LSCG'
+SOLVE_METHOD = 'SuperLU';
+% Maximum number of iterations for iterative solvers
+MAXITER  = 100;
+% Residu for conjugate gradient
+RESIDUAL = 1E-16;    
+% Nb of discretisation point for 3D-1D interpolation
+NInt = 50;
+%===================================
+%  MODEL PARAMETERS
+%===================================
+% hydraulic conductivity of the interstitium [m^2]
+k  = 1.4E-14;
+% fluid viscosity [kg/ms]
+mu = 8.9E-04;
+% hydraulic conductivity of the capillary walls [m^2 s/kg]
+Lp = 1.0E-7;
+% average interstitial pressure [Pa]
+P  = 1333.22;
+% characteristic flow speed in the capillary bed [m/s]
+U  = 166E-06;
+% characteristic length of the problem [m]
+d  = 240E-06;
+% average radius of the capillary vessels []
+RADIUS = 5E-06;
+%===================================
+%  BOUNDARY CONDITIONS
+%===================================
+% Faces:   x=0  x=L  y=0  y=L  z=0  z=L
+% BC labels (DIR / MIX)
+BClabel = 'DIR  DIR  DIR  DIR  DIR  DIR'
+% BC values
+BCvalue = '0.0  0.0  0.0  0.0  0.0  0.0'
+% Coefficient for MIX condition
+BETA = 1.0E-10

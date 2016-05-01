@@ -1,0 +1,38 @@
+GETFEM 5.0 in /u/laureandi/notaro/
+----------------------------------
+
+# CARICAMENTO MODULI NECESSARI
+$ module load gcc+system/4.9
+$ module load blas/9999
+$ module load lapack/9999
+$ module load openblas/9999
+$ module load scalapack/2
+
+# CONFIGURAZIONE
+$ ./configure CXX=/u/geo2/sw/Packages/compilers/gcc+system/4.9/bin/gcc --prefix='/u/laureandi/notaro' --with-pic --enable-shared --enable-superlu --with-blas=/u/geo2/sw/Toolchains/gcc+system/4.9/Packages/libs/openblas/9999/lib/libopenblas.so.0
+# oppure:
+BLAS_LIBS="-L/u/geo2/sw/Toolchains/gcc+system/4.9/Packages/libs/openblas/9999/ -lblas"
+
+--> OK:
+- BLAS library found. Link options: /u/geo2/sw/Toolchains/gcc+system/4.9/Packages/libs/openblas/9999/lib/libopenblas.so.0
+
+MA ORA DA PROBLEMI CON LAPACK!! (cannot find liblapack.so.3)
+
+Nota: $mkLapackLib = $mkBlasLib ma dentro non c'è liblapack.so!!
+
+Provo con:
+--with-lapack=/u/geo2/sw/Toolchains/gcc+system/4.9/Packages/libs/openblas/9999/lib/libopenblas.so.0
+---> WARNING: unrecognized options: --with-lapack
+
+Riprovo con:
+LAPACK_LIBS="-L/u/geo2/sw/Toolchains/gcc+system/4.9/Packages/libs/openblas/9999/ -llapack"
+---> niente, in effetti nel file 'configure' non è mai settata LAPACK_LIBS
+
+# INSTALLAZIONE
+$ make && make install
+
+# ESECUZIONE (altrimenti 'cannot find libgetfem.so.5')
+$ export LD_LIBRARY_PATH+=:/u/laureandi/notaro/lib/
+$ ./M3D1D input.param
+
+
