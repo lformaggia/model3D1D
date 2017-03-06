@@ -67,11 +67,11 @@ public:
 	/*! 
 		It links integration methods and finite element methods to the meshes
 	 */
-//	c_problem3d1d(void) : 
-//		mimt(mesht),  mimv(meshv),
-//		mf_Pt(mesht), mf_coeft(mesht), mf_Ut(mesht),
-//		mf_Pv(meshv), mf_coefv(meshv)
-//	{} 
+ //	c_problem3d1d(void) : 
+ //		mimt(mesht),  mimv(meshv),
+ //		mf_Pt(mesht), mf_coeft(mesht), mf_Ut(mesht),
+ //		mf_Pv(meshv), mf_coefv(meshv)
+ //	{} 
 	//! Initialize the problem
 	/*!
 		1. Read the .param filename from standard input
@@ -106,100 +106,139 @@ public:
 		Export solutions Ut, Pt, Uv, Pv from the monolithic array UM
 	 */
 	void export_vtk (const string & suff = "");
-	//! Compute mean tissue pressure
-	
 
-/*
+	//! Compute mean tissue pressure
 	inline scalar_type mean_pt (void){ 
 		return asm_mean(mf_Pt, mimt, 
 			gmm::sub_vector(UM, gmm::sub_interval(dof.Ut(), dof.Pt()))); 
 	}
+
 	//! Compute mean vessel pressure
 	inline scalar_type mean_pv (void){ 
 		return asm_mean(mf_Pv, mimv, 
 			gmm::sub_vector(UM, gmm::sub_interval(dof.Ut()+dof.Pt()+dof.Uv(), dof.Pv()))); 
 	}
+
 	//! Compute total flow rate (network to tissue) - pressure
 	inline scalar_type flow_rate (void) { return TFR; };
-*/
+
+	void Uplot(void){ 
+		size_type shift=dof.Ut()+dof.Pt();
+		size_type Cb=0;
+		cout<<"U c_problem3d1d:\n\n";
+		for(size_type b=0;b<nb_branches;++b){
+			cout<<" b"<<b<<" [";
+			if(b>0) shift+= Cb;
+			Cb=mf_Uvi[b].nb_dof();
+			for(size_type i=0; i<Cb; ++i)
+				cout<<" "<<UM[shift+i];
+			cout<<" ]\n"; 
+		}
+		cout<<"\n";
+	}
+
+	inline void ErrPlot(void){
+		cout<<" Incremento [";
+		for(size_type i=0; i<Errore.size();++i){cout<<" "<<Errore[i];}
+		cout<<" ]\n";
+		bool Plot=PARAM.int_value("Errore");
+		if (Plot){
+			cout<<"Curcatura =[ ";
+			for(size_type i=0; i<nb_branches; ++i){
+				cout<<" b"<<i<<" =[";
+				for(size_type j=0; j<mf_coefvi[i].nb_dof(); ++j)
+					cout<<" "<<(c_param.Curv())[i][j];
+				cout<<" ]\n";
+			}
+			cout<<"\n";
+		}
+	}
 
 protected:
-/*
-	//! Mesh for the interstitial tissue @f$\Omega@f$ (3D)
-	mesh mesht;
-	//! Mesh for the vessel network @f$\Lambda@f$ (1D)
-	mesh meshv;
-	//! Intergration Method for the interstitial tissue @f$\Omega@f$
-	mesh_im mimt;
-	//! Intergration Method for the vessel network @f$\Lambda@f$
-	mesh_im mimv;
-	//! Finite Element Method for the interstitial velocity @f$\mathbf{u}_t@f$
-	mesh_fem mf_Ut;
-	//! Finite Element Method for the interstitial pressure @f$p_t@f$
-	mesh_fem mf_Pt;
-	//! Finite Element Method for PDE coefficients defined on the interstitial volume
-	mesh_fem mf_coeft;  
-	//! Finite Element Method for the vessel velocity @f$u_v@f$
-	//! \note Array of local FEMs on vessel branches  @f$\Lambda_i@f$ (@f$i=1,\dots,N@f$)
-	vector<mesh_fem> mf_Uvi;
-	//! Finite Element Method for the vessel pressure @f$p_v@f$
-	mesh_fem mf_Pv; 
-	//! Finite Element Method for PDE coefficients defined on the vessel branches
-	//! \note Array of local FEMs on vessel branches  @f$\Lambda_i@f$ (@f$i=1,\dots,N@f$)
-	vector<mesh_fem> mf_coefvi;
-	//! Finite Element Method for PDE coefficients defined on the network
-	mesh_fem mf_coefv;
+	/*
+		//! Mesh for the interstitial tissue @f$\Omega@f$ (3D)
+		mesh mesht;
+		//! Mesh for the vessel network @f$\Lambda@f$ (1D)
+		mesh meshv;
+		//! Intergration Method for the interstitial tissue @f$\Omega@f$
+		mesh_im mimt;
+		//! Intergration Method for the vessel network @f$\Lambda@f$
+		mesh_im mimv;
+		//! Finite Element Method for the interstitial velocity @f$\mathbf{u}_t@f$
+		mesh_fem mf_Ut;
+		//! Finite Element Method for the interstitial pressure @f$p_t@f$
+		mesh_fem mf_Pt;
+		//! Finite Element Method for PDE coefficients defined on the interstitial volume
+		mesh_fem mf_coeft;  
+		//! Finite Element Method for the vessel velocity @f$u_v@f$
+		//! \note Array of local FEMs on vessel branches  @f$\Lambda_i@f$ (@f$i=1,\dots,N@f$)
+		vector<mesh_fem> mf_Uvi;
+		//! Finite Element Method for the vessel pressure @f$p_v@f$
+		mesh_fem mf_Pv; 
+		//! Finite Element Method for PDE coefficients defined on the vessel branches
+		//! \note Array of local FEMs on vessel branches  @f$\Lambda_i@f$ (@f$i=1,\dots,N@f$)
+		vector<mesh_fem> mf_coefvi;
+		//! Finite Element Method for PDE coefficients defined on the network
+		mesh_fem mf_coefv;
 
-	////////////////////////////////////////////////////////////////////
-	
-	//! Input file
-	ftool::md_param PARAM;
-	//! Algorithm description strings (mesh files, FEM types, solver info, ...) 
-	descr3d1d descr;
-	//! Physical parameters (dimensionless)
-	param3d1d param;
-	//! Dimension of the tissue domain (3)
-	size_type DIMT;
-	//! Number of vertices per branch in the vessel network
-	vector_size_type nb_vertices;
-	//! Number of branches in the vessel network
-	size_type nb_branches;
-	//! Number of extrema of the vessel network
-	size_type nb_extrema;
-	//! Number of junctions of the vessel network
-	size_type nb_junctions;
-	//! Number of degrees of freedom
-	dof3d1d dof;
-	//! Total flow rate from network to tissue
-	scalar_type TFR;
+		////////////////////////////////////////////////////////////////////
+		
+		//! Input file
+		ftool::md_param PARAM;
+		//! Algorithm description strings (mesh files, FEM types, solver info, ...) 
+		descr3d1d descr;
+		//! Physical parameters (dimensionless)
+		param3d1d param;
+		//! Dimension of the tissue domain (3)
+		size_type DIMT;
+		//! Number of vertices per branch in the vessel network
+		vector_size_type nb_vertices;
+		//! Number of branches in the vessel network
+		size_type nb_branches;
+		//! Number of extrema of the vessel network
+		size_type nb_extrema;
+		//! Number of junctions of the vessel network
+		size_type nb_junctions;
+		//! Number of degrees of freedom
+		dof3d1d dof;
+		//! Total flow rate from network to tissue
+		scalar_type TFR;
 
-	////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////
 
-	//! List of BC nodes on the tissue
-	vector< node > BCt;
-	//! List of BC nodes of the network
-	vector< node > BCv;
-	//! List of junction nodes of the network
-	vector< node > Jv;
-	
-	////////////////////////////////////////////////////////////////////
+		//! List of BC nodes on the tissue
+		vector< node > BCt;
+		//! List of BC nodes of the network
+		vector< node > BCv;
+		//! List of junction nodes of the network
+		vector< node > Jv;
+		
+		////////////////////////////////////////////////////////////////////
 
-	//! Monolithic matrix for the coupled problem
-	sparse_matrix_type AM;
-	//! Monolithic array of unknowns for the coupled problem
-	vector_type        UM;
-	//! Monolithic right hand side for the coupled problem
-	vector_type        FM;
+		//! Monolithic matrix for the coupled problem
+		sparse_matrix_type AM;
+		//! Monolithic array of unknowns for the coupled problem
+		vector_type        UM;
+		//! Monolithic right hand side for the coupled problem
+		vector_type        FM;
 
-	////////////////////////////////////////////////////////////////////
-*/
+		////////////////////////////////////////////////////////////////////
+	*/
 	vector_type Uv_old;
 	c_param3d1d c_param;
+	vector_type Errore;
 	sparse_matrix_type NLMvv;
 	sparse_matrix_type NLJvv;
+	sparse_matrix_type CM;
+	vector_type CFM;
+	sparse_matrix_type NL;
+	vector_type NLF;
 	void assembly_nonlinear_mat(void);
-	bool solve_pass(void);
-	void deassebly_nonlinear_mat(void);
+	bool solve_pass(size_type iter=0);
+	size_type ii;
+
+	//void deassebly_nonlinear_mat(void);
+	//void export_vtk(const string & suff);
 
 
 

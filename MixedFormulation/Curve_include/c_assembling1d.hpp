@@ -37,6 +37,7 @@ asm_network_nonlinear
 	assem.push_data(coef);
 	assem.push_mat(NLM);
 	assem.assembly(rg);
+
 }
 
 
@@ -51,7 +52,8 @@ asm_network_nonlinear_junctions
 	 const VEC & radius,
 	 const VEC & G,
 	 const VEC_I & k,
-	 const VEC & u_old
+	 const VEC & u_old,
+	 const bool Is_Newton
 	) 
 {
 
@@ -69,7 +71,6 @@ asm_network_nonlinear_junctions
 		if(i>0) shift+=dofi;
 
 		dofi=mf_ui[i].nb_dof();
-
 		scalar_type Ri = compute_radius(mim, mf_data, radius, i);
 		scalar_type Gi = G[0];
 		scalar_type ki_s= k[i][0];
@@ -77,40 +78,47 @@ asm_network_nonlinear_junctions
 		scalar_type ui_s= u_old[shift];
 		scalar_type ui_e= u_old[shift+dofi-1];
 
+		if(Is_Newton)
+			Gi=Gi*2;
+
 		NLJ(shift, shift)-=pi*Ri*Ri*Gi*ui_s*
 						( 	alfa  + 
 						  	beta  * ki_s * ki_s * Ri * Ri +   
 					  		gamma * ki_s * ki_s * ki_s *ki_s * Ri * Ri * Ri * Ri
-						);
-
+						);				
 		NLJ(shift+dofi-1, shift+dofi-1)+= pi*Ri*Ri*Gi*ui_e*
 									 ( 	alfa  +
 								  	 	beta  * ki_e * ki_e * Ri * Ri +   
 								  	 	gamma * ki_e * ki_e * ki_e * ki_e * Ri * Ri * Ri * Ri
 									  );	
+
 	}
 }
 
-/*
-	template<typename VEC, typename MIM, typename VEC_MESH>
-	void
-	compute_error
-		( MIM mimv,
-		  scalar_type Error,
-		  VEC_MESH mf_Uvi,
-		  VEC eps
-		)
-	{
-		Error=0.0;
-		size_type shift=0;
-		size_type dofi=mf_Uvi[0].nb_dof();
-		for (size_type b=0;b<mf_Uvi.size(); ++b){
-			if (b>0) shift+=dofi;
-			dofi=mf_Uvi[b].nb_dof();
-			Error+=gmm::compute_L2_norm(mf_Uvi[b],gmm::sub_vector(eps,gmm::sub_interval(shift, dofi)) );
+
+
+template<typename VEC_getfem, typename VEC, typename MESH_FEM>
+scalar_type
+euclidean_norm
+(
+	VEC_getfem & Unew,
+	VEC & Uold,
+	MESH_FEM & mf
+) 
+{
+	scalar_type dist=0;
+	size_type dofi=0;
+	size_type shift;
+	for(size_type branch=0; branch<mf.size();branch++){
+		dofi=mf[branch].nb_dof();
+		if(branch>0) shift=shift+dofi;
+		for(size_type el=0; el<dofi; el++){
+			dist=dist+abs(Unew[shift+el]-Uold[shift+el]);
 		}
 	}
-*/
+	return dist;
+}
+
 
 } /* end of namespace */
 

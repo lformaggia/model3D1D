@@ -13,6 +13,7 @@ struct c_param3d1d : public param3d1d {
 	//My Variable
 	vector_type G_;
 	scalar_type Gamma_;
+	scalar_type rho_;
 	vector<vector_type> lambdax_;
 	vector<vector_type> lambday_;
 	vector<vector_type> lambdaz_;	
@@ -63,22 +64,34 @@ struct c_param3d1d : public param3d1d {
 		}
 
 		if(!IMPORT_CURVE){
-			for(size_type b=0;b<n_branch;++b){
-				Curv_[b].resize(mf_datavi[b].nb_dof()); Curv_.clear();
-				Curv_[b].assign(mf_datavi[b].nb_dof(), 0.0);
-				
-				scalar_type lx_temp=lambdax_[b][0];
-				scalar_type ly_temp=lambday_[b][0];
-				scalar_type lz_temp=lambdaz_[b][0];
-					
-				lambdax_[b].resize(mf_datavi[b].nb_dof()); lambdax_[b].clear();
-				lambday_[b].resize(mf_datavi[b].nb_dof()); lambday_[b].clear();
-				lambdaz_[b].resize(mf_datavi[b].nb_dof()); lambdaz_[b].clear();
+			#ifdef M3D1D_VERBOSE_
+			cout<<"CURVE NOT IMPORTED, THE PROBLEM IS CONSIDERED LINEAR FOR ALL BRANCHES\n\n";
+			#endif
 
-				lambdax_[b].assign(mf_datavi[b].nb_dof(),lx_temp);
-				lambday_[b].assign(mf_datavi[b].nb_dof(),ly_temp);
-				lambdaz_[b].assign(mf_datavi[b].nb_dof(),lz_temp);
+			vector_type lx_temp,ly_temp,lz_temp;
+			std::ifstream ifst(FILE_.string_value("MESH_FILEV","1D points file"));
+			GMM_ASSERT1(ifst.good(), "impossible to read from file " << FILE_.string_value("MESH_FILEV","1D points file"));
+			asm_tangent_versor(ifst, lx_temp,ly_temp,lz_temp);
+			Curv_.resize(n_branch);
+			lambdax_.resize(n_branch);
+			lambday_.resize(n_branch);
+			lambdaz_.resize(n_branch); 
+
+			for(size_type b=0;b<n_branch;++b){
+				size_type dofi=mf_datavi[b].nb_dof();
+				Curv_[b].resize(dofi); Curv_[b].clear();
+				Curv_[b].assign(dofi, 0.0);
+				
+				gmm::resize(lambdax_[b],dofi);
+				gmm::resize(lambday_[b],dofi);
+				gmm::resize(lambdaz_[b],dofi);
+				
+				lambdax_[b].assign(dofi,lx_temp[b]);
+				lambday_[b].assign(dofi,ly_temp[b]);
+				lambdaz_[b].assign(dofi,lz_temp[b]);
+				
 			}
+
 		} else {
 			rasm_curve_parameter(mf_datavi,Curv_,lambdax_,lambday_,lambdaz_);
 			for(size_type b=0;b<n_branch;++b)
@@ -110,9 +123,10 @@ struct c_param3d1d : public param3d1d {
 			mu_ = FILE_.real_value("mu", "fluid viscosity [kg/ms]"); 
 			Lp_ = FILE_.real_value("Lp", "permeability of the vessel walls [m^2 s/kg]"); 
 			Gamma_= FILE_.real_value("Gamma");
+			rho_= FILE_.real_value("rho","density of the fluid");
 			// Compute the dimenless params
 			kt_.assign(dof_datat, k_/mu_*P_/U_/d_);
-			G_.assign(dof_datav, U_*U_/P_);
+			G_.assign(dof_datav, U_*U_*rho_/P_);
 			for (auto r : R_){ // C++11-only!
 				kv_.emplace_back(pi/2.0/(Gamma_+2.0)/mu_*P_*d_/U_*r*r*r*r);
 				Q_.emplace_back(2.0*pi*Lp_*P_/U_*r);
