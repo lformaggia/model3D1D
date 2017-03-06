@@ -254,7 +254,6 @@ problem3d1d::build_tissue_boundary (void)
 		rgvtk.write_mesh();
 		rgvtk.write_point_data(mf_coeft, indicator, "1t");
 	}
-	
 }
 
 void 
@@ -645,7 +644,7 @@ problem3d1d::assembly_mat(void)
 		
 	} /* end of branches loop */
 	
-if (nb_junctions > 0){
+   if (nb_junctions > 0){
 	#ifdef M3D1D_VERBOSE_
 	cout << "  Assembling Jvv" << " ..." << endl;
 	#endif
@@ -730,6 +729,7 @@ problem3d1d::assembly_rhs(void)
 	#endif
 	vector_type beta(dof.coeft(), 1.0/bcoef);
 	vector_type P0(dof.coeft(), p0coef);
+	vector_type P0_vel(dof.coefv(),p0coef);
 	
 	if (PARAM.int_value("TEST_RHS")) {
 		#ifdef M3D1D_VERBOSE_
@@ -753,7 +753,7 @@ problem3d1d::assembly_rhs(void)
 	#endif
 	sparse_matrix_type Mvv(dof.Uv(), dof.Uv());
 	asm_network_bc(Mvv, Fv, 
-			mimv, mf_Uvi, mf_coefv, BCv, P0, param.R(), bcoef);
+			mimv, mf_Uvi, mf_coefv, BCv, P0_vel, param.R(), bcoef);
 	gmm::add(Mvv, 
 		gmm::sub_matrix(AM,
 			gmm::sub_interval(dof.Ut()+dof.Pt(), dof.Uv()),
@@ -952,6 +952,19 @@ problem3d1d::solve(void)
 	gmm::clear(Bvt); gmm::clear(Bvv);
 	gmm::clear(Pt);  gmm::clear(Pv);  
 	gmm::clear(Uphi);
+
+		size_type shift=dof.Ut()+dof.Pt();
+		size_type Cb=0;
+		cout<<"U problem3d1d:\n\n";
+		for(size_type b=0;b<nb_branches;++b){
+			cout<<" b"<<b<<" [";
+			if(b>0) shift+= Cb;
+			Cb=mf_Uvi[b].nb_dof();
+			for(size_type i=0; i<Cb; ++i)
+				cout<<" "<<UM[shift+i];
+			cout<<" ]\n"; 
+		}
+		cout<<"\n";
 
 	return true;
 }
