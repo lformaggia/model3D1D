@@ -128,10 +128,10 @@ asm_tissue_bc
 			assemU.assembly(mf_u.linked_mesh().region(BC[f].rg));
 		}
 		else if (BC[f].label=="INT") { // Internal Node
-			DAL_WARNING1("internal node passed as boundary.");
+			//DAL_WARNING1("internal node passed as boundary.");
 		}
 		else if (BC[f].label=="JUN") { // Junction Node
-			DAL_WARNING1("junction node passed as boundary.");
+			//DAL_WARNING1("junction node passed as boundary.");
 		}
 		else {
 			GMM_ASSERT1(0, "Unknown Boundary Condition " << BC[f].label << endl);

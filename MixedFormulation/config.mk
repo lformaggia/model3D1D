@@ -1,1 +1,1 @@
-GETFEM_PREFIX=/home/nico/workspace/pacs/model3d1d/lib/getfem
+GETFEM_PREFIX=/opt/getfem
