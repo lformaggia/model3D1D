@@ -135,10 +135,10 @@ asm_network_bc
 				mim, mf_u[i], mf_data, gmm::scaled(P0, pi*Ri*Ri), BC[bc].rg);			
 		}
 		else if (BC[bc].label=="INT") { // Internal Node
-			DAL_WARNING1("internal node passed as boundary.");
+			//DAL_WARNING1("internal node passed as boundary.");
 		}
 		else if (BC[bc].label=="JUN") { // Junction Node
-			DAL_WARNING1("junction node passed as boundary.");
+			//DAL_WARNING1("junction node passed as boundary.");
 		}
 		else {
 			GMM_ASSERT1(0, "Unknown Boundary Condition"<< BC[bc].label << endl);
@@ -168,9 +168,9 @@ asm_network_junctions
 		"invalid data mesh fem for pressure (Qdim=1 required)");
 	GMM_ASSERT1 (mf_u[0].get_qdim() == 1, 
 		"invalid data mesh fem for velocity (Qdim=1 required)");
-	GMM_ASSERT1 (getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK(1,0)" &&
-		getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK_DISCONTINUOUS(1,0)",
-		"invalid data mesh fem for pressure (k>0 required)");
+	//GMM_ASSERT1 (getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK(1,0)" &&
+	//	getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK_DISCONTINUOUS(1,0)",
+	//	"invalid data mesh fem for pressure (k>0 required)");
 	
 	for (size_type i=0; i<mf_u.size(); ++i){ /* branch loop */
 
