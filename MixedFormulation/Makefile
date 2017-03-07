@@ -20,9 +20,11 @@ all: library
 	$(MAKE) -C src/3_Ybifurcation
 	$(MAKE) -C src/4_primalmixed
 	$(MAKE) -C src/5_CSF
+	$(MAKE) -C src/2_singlebranch_curved
 
 library: 
 	$(MAKE) -C include
+	$(MAKE) -C Curve_include
 
 doc:
 	install -d doc
