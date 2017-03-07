@@ -21,6 +21,7 @@ all: library
 	$(MAKE) -C src/4_primalmixed
 	$(MAKE) -C src/5_CSF
 	$(MAKE) -C src/2_singlebranch_curved
+	$(MAKE) -C src/3_Ybifurcation_curved
 
 library: 
 	$(MAKE) -C include
