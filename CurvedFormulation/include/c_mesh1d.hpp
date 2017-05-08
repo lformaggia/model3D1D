@@ -278,15 +278,6 @@ import_pts_file(
 						bgeot::get_token(istc, tmp, 1023);
 					}
 					if (d != 8) GMM_ASSERT1(0, "Points must have 7 coordinates: 3 for tangent versor, 3 for normal vector, 1 for curvature");
-
-					lx_t=tmpv[1];
-					ly_t=tmpv[2];
-					lz_t=tmpv[3];
-					lmod= sqrt(lx_t*lx_t+ly_t*ly_t+lz_t*lz_t);
-
-					lx_b.push_back(lx_t/lmod);
-					ly_b.push_back(ly_t/lmod);
-					lz_b.push_back(lz_t/lmod);
 					Curv_b.push_back(tmpv[7]);
 					if (tmp.compare("END_ARC") == 0) { thendc = true; }
 				} 			
@@ -323,6 +314,17 @@ import_pts_file(
 				BCB.idx = ind[1];
 				BCList.push_back(BCB);
 			}
+
+
+			lx_t=lpoints[jj][0]-lpoints[ii][0];
+			ly_t=lpoints[jj][1]-lpoints[ii][1];
+			lz_t=lpoints[jj][2]-lpoints[ii][2];
+			lmod=sqrt(lx_t*lx_t+ly_t*ly_t+lz_t*lz_t);
+
+			lx_b.push_back(lx_t/lmod);
+			ly_b.push_back(ly_t/lmod);
+			lz_b.push_back(lz_t/lmod);
+
 		} /* end of inner for */
 		Curv.push_back(Curv_b);
 		lx.push_back(lx_b);
@@ -355,42 +357,54 @@ void rasm_curve_parameter(
 	VEC lz_temp=lz;
 	size_type Nb=Curv_temp.size(); //Number of branch
 	size_type Ni=0; //Number of dof of the coefficient mesh at branch i
-	pfem fd = fem_descriptor("FEM_PK(1,1)");
-	scalar_type ct,lxt,lyt,lzt;
+	pfem fd_curv = fem_descriptor("FEM_PK(1,1)"); //Fem descriptor for curvature
+	pfem fd_tgv  = fem_descriptor("FEM_PK(1,0)"); //Fem descriptor for tangent versor
+	scalar_type ct;
 
 	for(size_type b=0; b<Nb;++b){
 		Ni=Curv_temp[b].size();
 	
 		//Reodering the value of the parameters
-		ct=Curv[b][1]; lxt=lx[b][1]; lyt=ly[b][1]; lzt=lz[b][1];
+		ct=Curv[b][1];
 		   //Shifting all elements
 		for(size_type i=2; i<Curv_temp[b].size(); i++){
 			Curv_temp[b][i-1]=Curv[b][i];
-			lx_temp[b][i-1]=lx[b][i];
-			ly_temp[b][i-1]=ly[b][i];
-			lz_temp[b][i-1]=lz[b][i];
 		}
 		Curv_temp[b].back()=ct;
-		lx_temp[b].back()= lxt;
-		ly_temp[b].back()= lyt;
-		lz_temp[b].back()= lzt;
 
 		//Adapting parameters to tbe finite element interpolation
 		Ni=mf_Coefi[b].nb_dof();
-		Curv[b].resize(Ni); lx[b].resize(Ni); ly[b].resize(Ni); lz[b].resize(Ni); 
+		Curv[b].resize(Ni); gmm::clear(Curv[b]);
+		 lx[b].resize(Ni);  gmm::clear(lx[b]);
+		 ly[b].resize(Ni);  gmm::clear(lx[b]);
+		 lz[b].resize(Ni);  gmm::clear(lx[b]);
 		
-		//Generating the P1 finite element
-		getfem::mesh_fem mf_tmp(mf_Coefi[b].linked_mesh());
-		mf_tmp.set_finite_element(mf_Coefi[b].linked_mesh().region(b).index(), fd);
+		//Generating the P1 finite element for curvature
+		getfem::mesh_fem mf_curv(mf_Coefi[b].linked_mesh());
+		mf_curv.set_finite_element(mf_Coefi[b].linked_mesh().region(b).index(), fd_curv);
 
-		//Interpolating value on a different mesh
-		gmm::row_matrix<vector_type> M(mf_Coefi[b].nb_dof(),mf_tmp.nb_dof());
-		getfem::interpolation(mf_tmp,mf_Coefi[b],M);
+		//Generating the P0 finite element for tangent versor
+		getfem::mesh_fem mf_tgv(mf_Coefi[b].linked_mesh());
+		mf_tgv.set_finite_element(mf_Coefi[b].linked_mesh().region(b).index(), fd_tgv);
 
-		gmm::mult(M,Curv_temp[b],Curv[b]);
-		gmm::mult(M,lx_temp[b],lx[b]);
-		gmm::mult(M,ly_temp[b],ly[b]);
-		gmm::mult(M,lz_temp[b],lz[b]);
+		//Interpolating v curvature on a different mesh fem 
+		gmm::row_matrix<vector_type> M_curv(mf_Coefi[b].nb_dof(),mf_curv.nb_dof());
+		getfem::interpolation(mf_curv,mf_Coefi[b],M_curv);
+
+		gmm::mult(M_curv,Curv_temp[b],Curv[b]);
+
+
+
+		//Interpolating v curvature on a different mesh fem 
+		gmm::row_matrix<vector_type> M_tgv(mf_Coefi[b].nb_dof(),mf_tgv.nb_dof());
+		getfem::interpolation(mf_tgv,mf_Coefi[b],M_tgv);
+
+		gmm::mult(M_tgv,lx_temp[b],lx[b]);
+		gmm::mult(M_tgv,ly_temp[b],ly[b]);
+		gmm::mult(M_tgv,lz_temp[b],lz[b]);
+
+		gmm::clear(M_tgv);
+		gmm::clear(M_curv);
 	}
 }
 
