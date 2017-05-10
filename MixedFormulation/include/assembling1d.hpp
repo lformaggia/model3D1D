@@ -144,7 +144,6 @@ asm_network_bc
 			GMM_ASSERT1(0, "Unknown Boundary Condition"<< BC[bc].label << endl);
 		}
 	}
-
 }
 
 
@@ -168,9 +167,9 @@ asm_network_junctions
 		"invalid data mesh fem for pressure (Qdim=1 required)");
 	GMM_ASSERT1 (mf_u[0].get_qdim() == 1, 
 		"invalid data mesh fem for velocity (Qdim=1 required)");
-	//GMM_ASSERT1 (getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK(1,0)" &&
-	//	getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK_DISCONTINUOUS(1,0)",
-	//	"invalid data mesh fem for pressure (k>0 required)");
+	GMM_ASSERT1 (getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK(1,0)" &&
+		getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK_DISCONTINUOUS(1,0)",
+		"invalid data mesh fem for pressure (k>0 required)");
 	
 	for (size_type i=0; i<mf_u.size(); ++i){ /* branch loop */
 
@@ -193,12 +192,25 @@ asm_network_junctions
 			std::vector<long signed int>::const_iterator bb = J_data[j].branches.begin();
 			std::vector<long signed int>::const_iterator be = J_data[j].branches.end();
 			// Outflow branch contribution
+			size_type last_, first_;
+			vector_type dof_enum;
+			size_type fine=0;
+			for(getfem::mr_visitor mrv(mf_u[i].linked_mesh().region(i)); !mrv.finished(); ++mrv){
+				for(auto b: mf_u[i].ind_basic_dof_of_element(mrv.cv())){
+					dof_enum.emplace_back(b);
+					fine++;
+				}
+			}
+			first_=dof_enum[0];
+			last_ =dof_enum[fine-1];
+			dof_enum.clear();
+
 			if (std::find(bb, be, i) != be){
-				J(row, (i+1)*mf_u[i].nb_dof()-1) -= pi*Ri*Ri; //col to be generalized!
+				J(row, i*mf_u[i].nb_dof()+last_) -= pi*Ri*Ri; //col to be generalized!
 			}
 			// Inflow branch contribution
 			if (i!=0 && std::find(bb, be, -i) != be){
-				J(row, i*mf_u[i].nb_dof()) += pi*Ri*Ri;	//col to be generalized!
+				J(row, i*mf_u[i].nb_dof()+first_) += pi*Ri*Ri;	//col to be generalized!
 			}
 		}
 	}

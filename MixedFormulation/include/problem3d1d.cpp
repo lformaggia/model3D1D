@@ -1,4 +1,4 @@
-/* -*- c++ -*- (enableMbars emacs c++ mode) */
+/* -*- c++ -*- (enableMbars emacs c++ mode) */ 
 /*======================================================================
     "Mixed Finite Element Methods for Coupled 3D/1D Fluid Problems"
         Course on Advanced Programming for Scientific Computing
@@ -19,41 +19,6 @@
 namespace getfem {
 
 
-//! Parameteres for exact solution (1_uncoupled)
-/*! 
-	\todo Read from param Lx, Ly, Lz and Kt
- */
-double Lx = 1.0, Ly = 1.0, Lz = 1.0, kappat = 1.0; 
-//! Exact pressure 
-double sol_pt(const bgeot::base_node & x){
-	return sin(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*sin(2*pi/Lz*x[2]);
-}
-//! Exact x velocity
-double sol_utx(const bgeot::base_node & x){
-	return -2.0*pi*kappat/Lx*cos(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*sin(2.0*pi/Lz*x[2]);
-}
-//! Exact y velocity
-double sol_uty(const bgeot::base_node & x){
-	return -2.0*pi*kappat/Ly*sin(2.0*pi/Lx*x[0])*cos(2.0*pi/Ly*x[1])*sin(2.0*pi/Lz*x[2]);
-}
-//! Exact z velocity
-double sol_utz(const bgeot::base_node & x){
-	return -2.0*pi*kappat/Lz*sin(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*cos(2.0*pi/Lz*x[2]);
-}
-//! Exact velocity magnitude
-double sol_utm(const bgeot::base_node & x){
-	return sqrt(sol_utx(x)*sol_utx(x)+sol_uty(x)*sol_uty(x)+sol_utz(x)*sol_utz(x));
-}
-//! Exact vectorial velocity
-std::vector<double> sol_ut(const bgeot::base_node & x){
-	std::vector<double> out(3);
-	out[0] = sol_utx(x); out[1] = sol_uty(x); out[2] = sol_utz(x);
-	return out;
-}
-//! Exact rhs
-double sol_gt(const bgeot::base_node & x){
-	return 4.0*pi*pi*kappat*(1.0/(Lx*Lx)+1.0/(Ly*Ly)+1.0/(Lz*Lz))*sin(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*sin(2.0*pi/Lz*x[2]);
-}
 
 
 /////////// Initialize the problem ///////////////////////////////////// 
@@ -440,21 +405,33 @@ try {
 					// Create a new junction node
 					Jv.emplace_back("JUN", 0, i1, fer);
 					fer++;
+					//} QUI C'ERA LA CHIUSURA DI JUNCTION.CONTAINS(TMP)
+					// Search for index of second containing branch (\mathcal{P}^{out}_j)
+					size_type secondbranch = 0; 
+					size_type secondcv = (( cv1 == cv) ? cv2 : cv1);
+					size_type firstcv  = (( cv1 != cv) ? cv2 : cv1);
+					contained = false;
+					while (!contained && secondbranch<nb_branches ) {
+						if(secondbranch != firstbranch)
+							contained = meshv.region(secondbranch).is_in(secondcv);
+						if (!contained) secondbranch++;
+					}
+					GMM_ASSERT1(contained=true, "No branch region contains node i1!");
+					// Add the two branches
+					scalar_type in=0;
+					if(meshv.ind_points_of_convex(firstcv)[0]==i1) in=-1;
+					else if (meshv.ind_points_of_convex(firstcv)[1]==i1) in=+1;
+					GMM_ASSERT1(in!=0, "There is something wrong in firstbranch convex index");
+					Jv.back().branches.emplace_back(in*firstbranch);
+
+					in=0;
+					if(meshv.ind_points_of_convex(secondcv)[0]==i1) in=-1;
+					else if (meshv.ind_points_of_convex(secondcv)[1]==i1) in=+1;
+					GMM_ASSERT1(in!=0, "There is something wrong in secondbranch convex index");
+					Jv.back().branches.emplace_back(in*secondbranch);
+					Jv.back().value += param.R(mimv, firstbranch);
+					Jv.back().value += param.R(mimv, secondbranch);
 				}
-				// Search for index of second containing branch (\mathcal{P}^{out}_j)
-				size_type secondbranch = firstbranch+1; 
-				size_type secondcv = (( cv1 == cv) ? cv2 : cv1);
-				contained = false;
-				while (!contained && secondbranch<nb_branches ) {
-					contained = meshv.region(secondbranch).is_in(secondcv);
-					if (!contained) secondbranch++;
-				}
-				GMM_ASSERT1(contained=true, "No branch region contains node i1!");
-				// Add the two branches
-				Jv.back().branches.emplace_back(+firstbranch);
-				Jv.back().branches.emplace_back(-secondbranch);
-				Jv.back().value += param.R(mimv, firstbranch);
-				Jv.back().value += param.R(mimv, secondbranch);
 			}
 		}
 		else if (meshv.convex_to_point(i1).size()>=2){ /* non-trivial outflow junction */
@@ -610,7 +587,7 @@ problem3d1d::assembly_mat(void)
 		if(i>0) shift += mf_Uvi[i-1].nb_dof();
 		scalar_type Ri = param.R(mimv, i);
 		// Coefficient \pi^2*Ri'^4/\kappa_v
-		vector_type ci(mf_coefvi[i].nb_dof(), pi*pi*Ri*Ri*Ri*Ri/param.kv(i));
+		vector_type ci(mf_coefvi[i].nb_dof(), pi*pi*Ri*Ri*Ri*Ri/param.kv(mimv,i));
 		// Allocate temp local matrices
 		sparse_matrix_type Mvvi(mf_Uvi[i].nb_dof(), mf_Uvi[i].nb_dof());
 		sparse_matrix_type Dvvi(dof.Pv(), mf_Uvi[i].nb_dof());
@@ -664,7 +641,7 @@ problem3d1d::assembly_mat(void)
 		gmm::sub_matrix(AM,
 			 gmm::sub_interval(dof.Ut()+dof.Pt()+dof.Uv(), dof.Pv()),
 			 gmm::sub_interval(dof.Ut()+dof.Pt(), dof.Uv())));
-}
+  }
 	#ifdef M3D1D_VERBOSE_
 	cout << "  Assembling aux exchange matrices Mbar and Mlin ..." << endl;
 	#endif

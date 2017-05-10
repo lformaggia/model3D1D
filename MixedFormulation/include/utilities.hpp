@@ -19,6 +19,7 @@
 #include <getfem/getfem_assembling.h> 
 #include <getfem/getfem_mesh.h>
 #include <gmm/gmm.h>
+#include <defines.hpp>
 
 namespace getfem {
 
@@ -105,6 +106,7 @@ asm_mean(const mesh_fem &mf, const mesh_im &mim, const VEC &U)
 	
 	return v[0];
 }
+
 //! Aux function to save a gmm::col_vector as a plain list of values
 template 
 <typename L> 
@@ -118,6 +120,30 @@ write_col_vector(std::ostream &o, const L &l)
       o << " \n";
     }
 }
+
+
+//! Parameteres for exact solution (1_uncoupled)
+/*! 
+	\todo Read from param Lx, Ly, Lz and Kt
+ */
+const double Lx = 1.0, Ly = 1.0, Lz = 1.0, kappat = 1.0; 
+	//! Exact pressure 
+double sol_pt(const bgeot::base_node & x);
+	//! Exact x velocity
+double sol_utx(const bgeot::base_node & x);
+	//! Exact y velocity
+double sol_uty(const bgeot::base_node & x);
+	//! Exact z velocity
+double sol_utz(const bgeot::base_node & x);
+	//! Exact velocity magnitude
+double sol_utm(const bgeot::base_node & x);
+	//! Exact vectorial velocity
+std::vector<double> sol_ut(const bgeot::base_node & x);
+	//! Exact rhs
+double sol_gt(const bgeot::base_node & x);
+
+
+
 
 } /* end of namespace */
 

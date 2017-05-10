@@ -66,4 +66,38 @@ split(const std::string & s,
 	return elems;
 }
 
+
+
+//! Exact pressure 
+double sol_pt(const bgeot::base_node & x){ 
+	return sin(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*sin(2*pi/Lz*x[2]);
+}
+//! Exact x velocity
+double sol_utx(const bgeot::base_node & x){
+	return -2.0*pi*kappat/Lx*cos(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*sin(2.0*pi/Lz*x[2]);
+}
+//! Exact y velocity
+double sol_uty(const bgeot::base_node & x){
+	return -2.0*pi*kappat/Ly*sin(2.0*pi/Lx*x[0])*cos(2.0*pi/Ly*x[1])*sin(2.0*pi/Lz*x[2]);
+} 
+//! Exact z velocity
+double sol_utz(const bgeot::base_node & x){
+	return -2.0*pi*kappat/Lz*sin(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*cos(2.0*pi/Lz*x[2]);
+}
+//! Exact velocity magnitude
+double sol_utm(const bgeot::base_node & x){
+	return sqrt(sol_utx(x)*sol_utx(x)+sol_uty(x)*sol_uty(x)+sol_utz(x)*sol_utz(x));
+}
+//! Exact vectorial velocity
+std::vector<double> sol_ut(const bgeot::base_node & x){
+	std::vector<double> out(3);
+	out[0] = sol_utx(x); out[1] = sol_uty(x); out[2] = sol_utz(x);
+	return out;
+}
+//! Exact rhs
+double sol_gt(const bgeot::base_node & x){
+	return 4.0*pi*pi*kappat*(1.0/(Lx*Lx)+1.0/(Ly*Ly)+1.0/(Lz*Lz))*sin(2.0*pi/Lx*x[0])*sin(2.0*pi/Ly*x[1])*sin(2.0*pi/Lz*x[2]);
+}
+
+
 }
