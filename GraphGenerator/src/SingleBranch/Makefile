@@ -18,7 +18,7 @@ main.o: main.cpp
 	$(CXX) $(STDFLAG) $(GRAPH_INCLUDE) $(OPTFLAGS) $(WARNREAD)  -o main.o -c main.cpp
 
 exec: main.o
-	$(CXX) $(STDFLAG) $(GRAPH_LIBRARY) -L../../lib -lgraphgenerator  main.o -o main  
+	$(CXX) $(GRAPH_LIBRARY) -L../../lib -lgraphgenerator  main.o -o main  
 
 clean:
 	$(RM) $(LIBOBJS) *~

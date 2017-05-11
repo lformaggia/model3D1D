@@ -1,4 +1,5 @@
-PROJECT_DIR = /home/pacs_student/Downloads/Desktop/model3D1D
+# Project Path (this file path)
+PROJECT_DIR = /home/pacs_student/model3D1D
 
 # Installation path
 export mkBGLgeomHome = /media/More_SPACE/BGLgeom
@@ -56,8 +57,9 @@ MANWORKS_LIBRARY = -L$(GETFEM_LIB_DIR) -lgetfem
 # Specific Curved M3D1D Include list
 C_MANWORKS_INCLUDE = -I$(MANWORKS_INC_DIR) -I$(GETFEM_INC_DIR) -I$(C_MANWORKS_INC_DIR)
 # Specific Curved M3D1D Library list
-C_MANWORKS_LIBRARY = -L$(GETFEM_LIB_DIR) -lgetfem -L$(MANWORKS_LIB_DIR) -lproblem3d1d
-
+C_MANWORKS_LIBRARY =  -lgetfem -lproblem3d1d
+# Specific Curved M3D1D Library directory
+C_MANWORK_LIBRARY_DIR = -L$(GETFEM_LIB_DIR) -L$(MANWORKS_LIB_DIR)
 
 # Compiler and standard for the compiler
 CXX = g++

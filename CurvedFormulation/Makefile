@@ -19,9 +19,28 @@
 
 all:
 	make -C include
+	make -C src/1_LinearSingleBranch
+	make -C src/2_CurvedSingleBranch
+	make -C src/3_LinearBifurcation
+	make -C src/4_CurvedBifurcation
+	make -C src/5_LinearRombus
+	make -C src/6_CurvedRombus
 
 clean:
 	make clean -C include
+	make clean -C src/1_LinearSingleBranch
+	make clean -C src/2_CurvedSingleBranch
+	make clean -C src/3_LinearBifurcation
+	make clean -C src/4_CurvedBifurcation
+	make clean -C src/5_LinearRombus
+	make clean -C src/6_CurvedRombus
 
 distclean: clean
-	make distclean	-C include
+	make distclean -C include
+	make distclean -C src/1_LinearSingleBranch
+	make distclean -C src/2_CurvedSingleBranch
+	make distclean -C src/3_LinearBifurcation
+	make distclean -C src/4_CurvedBifurcation
+	make distclean -C src/5_LinearRombus
+	make distclean -C src/6_CurvedRombus
+

@@ -1,6 +1,24 @@
+/* -*- c++ -*- (enableMbars emacs c++ mode) */ 
+/*======================================================================
+    "Mixed Finite Element Methods for Coupled 3D/1D Fluid Curved Problems"
+        Course on Advanced Programming for Scientific Computing
+                      Politecnico di Milano
+                          A.Y. 2016-2017
+                  
+                Copyright (C) 2017 Giorgio Raimondi
+======================================================================*/
+/*! 
+  @file   curved_network_reader.cpp
+  @author Giorgio Raimondi <giorgio3.raimondi@mail.polimi.it>
+  @date   May 2017.
+  @brief  Function declaration for Reading generic ASCII format for bspline_geometry.
+ */    
+ /*! @defgroup graph reader routines */
 #include "curved_network_reader.hpp"
 
 namespace NetDiff{
+
+
 
 void curved_reader(int argc, char *argv[]){
 
@@ -9,10 +27,10 @@ void curved_reader(int argc, char *argv[]){
 	ftool::md_param PARAM;
  	PARAM.read_command_line(argc, argv);	
  	
-	std::string in_filename=PARAM.string_value("MESH_FILEV","Pass the input file's path for the graph initialization");
-	bool Interpolation=PARAM.int_value("Interpolation");
+	std::string in_filename=PARAM.string_value("INPUT_ASCII","Pass the input file's path for the graph initialization");
+	bool Interpolation=PARAM.int_value("INTERP");
 	BSP_type _type;
-	if(Interpolation)
+	if(Interpolation==1)
 		_type=BSP_type::Interp;
 	else
 		_type=BSP_type::Approx;
@@ -53,7 +71,7 @@ void curved_reader(int argc, char *argv[]){
 	}
 	
 	// Writing on a pts output
-	std::string out_pts_filename=PARAM.string_value("MESH_FILEV","Pass the output file name for the graph");
+	std::string out_pts_filename=PARAM.string_value("OUTPUT_PTS","Pass the output file name for the graph");
 	writer_pts<Graph,3> W(out_pts_filename);
 	W.export_pts(G);	
 }
