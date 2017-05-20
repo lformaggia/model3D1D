@@ -19,19 +19,19 @@ export mkEigenInc = /u/geo2/sw/Packages/libs/eigen/3/include/eigen3
 GETFEM_LIB_DIR     = $(mkGetFEMHome)/lib
 # Path to GetFEM includes
 GETFEM_INC_DIR     = $(mkGetFEMHome)/include
-# libBGLgeom is stored here (we consider the installation path)
-BGLGEOM_DIR        = $(mkBGLgeomHome)/libBGLgeom
-# Example on network diffusion is stored here
-NETW_DIR           = $(mkBGLgeomHome)/network_diffusion
+# libBGLgeom include directory
+BGLGEOM_INC_DIR    = $(mkBGLgeomHome)/libBGLgeom/include
+# libBGLgeom library directory
+BGLGEOM_LIB_DIR    = $(mkBGLgeomHome)/libBGLgeom/lib
 # Path to BGL includes
 BGL_INC_DIR        = $(mkBGLInc)
 # Path to BGL Netdiff includes
-BGL_NETW_INC       = $(mkBGLgeomHome)/include
+BGL_NETW_INC       = $(mkBGLgeomHome)/network_diffusion/include
 # Path to Eigen include
 EIGEN_INC          = $(mkEigenInc)
 
 
-
+# Path to Curved M3D1D include
 C_MANWORKS_INC_DIR = $(PROJECT_DIR)/CurvedFormulation/include
 # Path to Curved M3D1D library
 C_MANWORKS_LIB_DIR = $(PROJECT_DIR)/CurvedFormulation/lib
@@ -47,9 +47,11 @@ GRAPH_LIB_DIR      = $(PROJECT_DIR)/GraphGenerator/lib
 
 
 # Specific Graph Generator Include list
-GRAPH_INCLUDE = -I$(GRAPH_INC_DIR) -I$(NETW_DIR)/include -I$(BGL_NETW_INC) -I$(BGLGEOM_DIR)/include -I$(EIGEN_INC) -I$(GETFEM_INC_DIR) -I$(C_MANWORKS_INC_DIR) -I$(MANWORKS_INC_DIR)
+GRAPH_INCLUDE = -I$(GRAPH_INC_DIR) -I$(BGLGEOM_INC_DIR) -I$(EIGEN_INC) -I$(GETFEM_INC_DIR) -I$(C_MANWORKS_INC_DIR) -I$(MANWORKS_INC_DIR) -I$(BGL_NETW_INC)
 # Specific Graph Generator Library list (for test case)
-GRAPH_LIBRARY = -L$(GETFEM_LIB_DIR) -L$(MANWORKS_LIB_DIR) -L$(C_MANWORKS_LIB_DIR) -lc_problem3d1d -lproblem3d1d -lgetfem
+GRAPH_LIBRARY = -lBGLgeom -lc_problem3d1d -lproblem3d1d -lgetfem
+# Specific Graph Generator Library directory
+GRAPH_LIBRARY_DIR = -L$(BGLGEOM_LIB_DIR) -L$(C_MANWORKS_LIB_DIR) -L$(MANWORKS_LIB_DIR) -L$(GETFEM_LIB_DIR) 
 # Specific Linear M3D1D Include list
 MANWORKS_INCLUDE = -I$(MANWORKS_INC_DIR) -I$(GETFEM_INC_DIR)
 # Specific Linear M3D1D Library list

@@ -624,18 +624,6 @@ c_problem3d1d::assembly_mat(void)
 			gmm::sub_matrix(AM, 
 				gmm::sub_interval(dof.Ut()+dof.Pt()+dof.Uv(), dof.Pv()),
 				gmm::sub_interval(dof.Ut()+dof.Pt()+shift,     mf_Uvi[i].nb_dof()))); 
-		/*
-		cout<<"\n Matrix D:\n";
-		for(size_type qq=0; qq<mf_Uvi[i].nb_dof();qq++){
-			for(size_type vv=0; vv<mf_Uvi[i].nb_dof(); vv++){
-				//if(Dvvi(qq,vv)>1E-10)
-				//cout<<"  Mvv"<<i<<"["<<qq<<","<<vv<<"]="<<Mvvi(qq,vv);
-				cout<<Mvvi(qq,vv)<<" ";
-			}
-			cout<<"   ;\n";
-		}
-		cout<<endl<<endl;
-		*/
 		gmm::clear(Mvvi); 
 		gmm::clear(Dvvi);	
 	} /* end of branches loop */

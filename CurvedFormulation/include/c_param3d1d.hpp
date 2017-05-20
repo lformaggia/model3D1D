@@ -36,6 +36,7 @@
 #include <utilities.hpp> // compute_radius
 #include <param3d1d.hpp>
 #include <c_mesh1d.hpp> //rasm_curve_parameter 
+#include <c_assembling1d.hpp> //simple_compute_radius
 
 namespace getfem {
 
@@ -218,6 +219,16 @@ struct c_param3d1d : public param3d1d {
 	vector<vector_type> & lambdaz (void) { return lambdaz_; }
 	//! Get vessel curvature
 	vector<vector_type> & Curv (void) { return Curv_; }
+	//! Get the vessel Radius at a given dof
+	scalar_type R  (const getfem::mesh_im & mim, const size_type rg) { 
+		return simple_compute_radius(mim, mf_datav_, R_, rg);  
+	}
+	//! Get the vessel wall permeability at a given dof
+	scalar_type kv  (const getfem::mesh_im & mim, const size_type rg) { 
+		return simple_compute_radius(mim, mf_datav_, kv_, rg);  
+	}
+	//! Get the radius
+	vector_type & R (void) { return R_; }
  
 }; /* end of class */
 

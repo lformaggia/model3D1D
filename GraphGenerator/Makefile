@@ -15,7 +15,6 @@
 .PHONY: all doc clean distclean library exec1 
 
 all: library
-#	$(MAKE) -C src/1_uncoupled
 
 
 library: 
@@ -27,7 +26,7 @@ doc:
 	doxygen Doxyfile
 	
 exec1: all
-	makedir vtk -C src/1_uncoupled
+	makedir vtk -C src/SingleBranch
 	./M3D1D input.param
 
 pdf: doc
@@ -35,11 +34,11 @@ pdf: doc
 
 clean:
 	$(RM) -r *~ *.log
-	$(MAKE) -C include clean
-#	$(MAKE) -C src/1_uncoupled clean
+	$(MAKE) clean -C include 
+	$(MAKE) clean -C src/SingleBranch 
 
 distclean: clean
 	$(RM) -r doc/*
-	$(MAKE) -C include distclean
-#	$(MAKE) -C src/1_uncoupled distclean
+	$(MAKE) distclean -C include
+	$(MAKE) distclean -C src/SingleBranch
 

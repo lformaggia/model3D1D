@@ -105,7 +105,7 @@ asm_network_nonlinear_junctions
 		if(i>0) shift+=dofi;
 
 		dofi=mf_ui[i].nb_dof();
-		scalar_type Ri = compute_radius(mim, mf_data, radius, i);
+		scalar_type Ri = simple_compute_radius(mim, mf_data, radius, i);
 		scalar_type Gi = G[0]; // Dynamic pressure gain term
 		scalar_type ki_s= k[i][0]; //Curvature at the beginning of the branch
 		scalar_type ki_e= k[i].back(); //Curvature at the end of the branch
@@ -131,6 +131,94 @@ asm_network_nonlinear_junctions
 									  );	
 
 	}
+}
+
+template<typename MAT, typename VEC, typename PARAM>
+void
+asm_network_junctions
+	(MAT & J,
+	 const mesh_im & mim,
+	 const std::vector<mesh_fem> & mf_u,
+	 const mesh_fem & mf_p,
+	 const mesh_fem & mf_data,
+	 const std::vector<getfem::node> & J_data,
+	 const VEC & radius,
+	 PARAM & P
+	 ) 
+{
+	GMM_ASSERT1 (mf_p.get_qdim() == 1, 
+		"invalid data mesh fem for pressure (Qdim=1 required)");
+	GMM_ASSERT1 (mf_u[0].get_qdim() == 1, 
+		"invalid data mesh fem for velocity (Qdim=1 required)");
+	GMM_ASSERT1 (getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK(1,0)" &&
+		getfem::name_of_fem(mf_p.fem_of_element(0)) != "FEM_PK_DISCONTINUOUS(1,0)",
+		"invalid data mesh fem for pressure (k>0 required)");
+	
+	for (size_type i=0; i<mf_u.size(); ++i){ /* branch loop */
+
+		scalar_type Ri = simple_compute_radius(mim, mf_data, radius, i);
+		
+		for (size_type j=0; j<J_data.size(); ++j){
+
+			// Identify pressure dof corresponding to junction node
+			VEC psi(mf_p.nb_dof());
+			asm_basis_function(psi, mim, mf_p, J_data[j].rg);
+			size_type row = 0;
+			bool found = false;
+			while (!found && row<mf_p.nb_dof()){
+				found = (1.0 - psi[row] < 1.0E-06);
+				if (!found) row++;
+			}
+			GMM_ASSERT1 (row!=0 && found,  // No junction in first point
+				"Error in assembling pressure basis function");
+			std::vector<long signed int>::const_iterator bb = J_data[j].branches.begin();
+			std::vector<long signed int>::const_iterator be = J_data[j].branches.end();
+			// Outflow branch contribution
+			size_type last_, first_;
+			vector_type dof_enum;
+			size_type fine=0;
+			for(getfem::mr_visitor mrv(mf_u[i].linked_mesh().region(i)); !mrv.finished(); ++mrv){
+				for(auto b: mf_u[i].ind_basic_dof_of_element(mrv.cv())){
+					dof_enum.emplace_back(b);
+					fine++;
+				}
+			}
+			first_=dof_enum[0];
+			last_ =dof_enum[fine-1];
+			dof_enum.clear();
+			
+			if (std::find(bb, be, i) != be){
+				J(row, i*mf_u[i].nb_dof()+last_) -= pi*Ri*Ri; //col to be generalized!
+			}
+			// Inflow branch contribution
+			if (i!=0 && std::find(bb, be, -i) != be){
+				J(row, i*mf_u[i].nb_dof()+first_) += pi*Ri*Ri;	//col to be generalized!
+			}
+		}
+	}
+} /* end of asm_junctions */
+
+//! Aux function to extract the radius of the ith branch, R[i] 
+template
+<typename VEC>
+scalar_type
+simple_compute_radius
+	(const mesh_im & mim,
+	 const mesh_fem & mf_coef,
+	 const VEC & R,
+	 const size_type & rg
+	 ) 
+{
+	vector_type dof_enum;
+	size_type fine=0;
+	for(getfem::mr_visitor mrv(mf_coef.linked_mesh().region(rg)); !mrv.finished(); ++mrv){
+				for(auto b: mf_coef.ind_basic_dof_of_element(mrv.cv())){
+					dof_enum.emplace_back(b);
+					fine++;
+				}
+			}
+	size_type first_=dof_enum[0];
+	return R[first_];
 }
 
 
