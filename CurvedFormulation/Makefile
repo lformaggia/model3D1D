@@ -12,7 +12,7 @@
 #  @date   May 2017.
 #
 #======================================================================    
-.PHONY= all clean distclean
+.PHONY= all clean distclean doc pdf
 .DEFAULT_GOAL=all
 
 
@@ -26,6 +26,13 @@ all:
 	make -C src/5_LinearRombus
 	make -C src/6_CurvedRombus
 
+doc:
+	install -d doc
+	doxygen Doxyfile
+
+pdf: doc
+	$(MAKE) -C doc/latex pdf
+
 clean:
 	make clean -C include
 	make clean -C src/1_LinearSingleBranch
@@ -36,6 +43,7 @@ clean:
 	make clean -C src/6_CurvedRombus
 
 distclean: clean
+	$(RM) -r doc/*
 	make distclean -C include
 	make distclean -C src/1_LinearSingleBranch
 	make distclean -C src/2_CurvedSingleBranch

@@ -1,15 +1,15 @@
 # ====================================================================
-#   "Mixed Finite Element Methods for Coupled 3D/1D Fluid Problems"
+#   "Mixed Finite Element Methods for Coupled 3D/1D Fluid Curved Problems"
 #      Course on Advanced Programming for Scientific Computing
 #                     Politecnico di Milano
-#                         A.Y. 2014-2015
+#                         A.Y. 2016-2017
 #
-#                    Copyright D. Notaro 2015
+#                    Copyright G. Raimondi 2017
 # ====================================================================
 #   FILE        : Makefile
 #   DESCRIPTION : makefile for test simulations
-#   AUTHOR      : Domenico Notaro <domenico.not@gmail.com>
-#   DATE        : November 2015
+#   AUTHOR      : Giorgio Raimondi <giorgio3.raimondi@mail.polimi.it>
+#   DATE        : Maggio 2017
 # ====================================================================
 
 .PHONY: all doc clean distclean library exec1 
