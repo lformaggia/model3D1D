@@ -44,6 +44,7 @@ clean:
 
 distclean: clean
 	$(RM) -r doc/*
+	$(RM) -r doc
 	make distclean -C include
 	make distclean -C src/1_LinearSingleBranch
 	make distclean -C src/2_CurvedSingleBranch
