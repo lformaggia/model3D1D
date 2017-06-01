@@ -12,7 +12,7 @@
 #  @date   May 2017.
 #
 #======================================================================    
-.PHONY= all clean distclean doc pdf
+.PHONY= all clean distclean doc pdf library
 .DEFAULT_GOAL=all
 
 
@@ -25,6 +25,9 @@ all:
 	make -C src/4_CurvedBifurcation
 	make -C src/5_LinearRombus
 	make -C src/6_CurvedRombus
+
+library:
+	make -C include
 
 doc:
 	install -d doc

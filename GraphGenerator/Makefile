@@ -12,20 +12,22 @@
 #   DATE        : Maggio 2017
 # ====================================================================
 
-.PHONY: all doc clean distclean library exec1 
+.PHONY: all doc pdf clean distclean library exec 
 
 all: library
-
+	$(MAKE) -C src/SingleBranch
 
 library: 
 	$(MAKE) -C include
-	$(MAKE) -C src/SingleBranch
 
 doc:
 	install -d doc
 	doxygen Doxyfile
+
+pdf: doc
+	$(MAKE) -C doc/latex pdf
 	
-exec1: all
+exec: all
 	makedir vtk -C src/SingleBranch
 	./M3D1D input.param
 
