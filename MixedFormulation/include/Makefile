@@ -14,9 +14,9 @@
 
 include ../../Makefile.inc
 
-CPPFLAGS=-I. -I$(mkGetFEMHome)/include
-CXXFLAGS=-std=c++11
-OPTFLAGS=-O3 -DNDEBUG -march=native
+mCPPFLAGS=-I. -I$(mkGetFEMHome)/include
+mCXXFLAGS=-std=c++11
+mOPTFLAGS=-O3 -DNDEBUG -march=native
 
 mLIBDIR=../lib
 mLIBNAME=problem3d1d

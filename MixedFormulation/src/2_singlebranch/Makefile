@@ -26,7 +26,7 @@ mLDFLAGS=-L../../lib -L$(mkGetFEMHome)/lib
 mLIBRARIES=-lproblem3d1d -lgetfem
 
 mSRCS=$(wildcard *.cpp)
-mOBJS=$(SRCS:.cpp=.o)
+mOBJS=$(mSRCS:.cpp=.o)
 mEXEC=M3D1D
 
 mOUTDIR=vtk
@@ -40,8 +40,8 @@ all: $(mEXEC)
 %.o: %.cpp
 	$(CXX) $(mCPPFLAGS) $(mCXXFLAGS) $(mOPTFLAGS) -o $@ -c $<
 
-$(EXEC): $(mOBJS)
-	$(mCXX) $(mLDFLAGS) -o $@ $(mOBJS) $(mLIBRARIES)
+$(mEXEC): $(mOBJS)
+	$(CXX) $(mLDFLAGS) -o $@ $(mOBJS) $(mLIBRARIES)
 
 clean:
 	$(RM) $(mOBJS) $(mEXEC) *~ *.log
