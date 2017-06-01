@@ -1,7 +1,7 @@
 # Project Path (this file path)
 PROJECT_DIR = /home/pacs_student/model3D1D
 
-# Installation path
+# Path to BGLgeom Library
 export mkBGLgeomHome = /media/More_SPACE/BGLgeom
 
 # Path to Boost Graph Library
@@ -51,9 +51,9 @@ GRAPH_INCLUDE = -I$(GRAPH_INC_DIR) -I$(BGLGEOM_INC_DIR) -I$(EIGEN_INC) -I$(GETFE
 # Specific Graph Generator Library list (for test case)
 GRAPH_LIBRARY = -lBGLgeom -lc_problem3d1d -lproblem3d1d -lgetfem
 # Specific Graph Generator Library directory
-GRAPH_LIBRARY_DIR = -L$(BGLGEOM_LIB_DIR) -L$(C_MANWORKS_LIB_DIR) -L$(MANWORKS_LIB_DIR) -L$(GETFEM_LIB_DIR) 
+GRAPH_LIBRARY_DIR = -L$(BGLGEOM_LIB_DIR) -L$(MANWORKS_LIB_DIR) -L$(GETFEM_LIB_DIR) -L$(C_MANWORKS_LIB_DIR)
 # Specific Linear M3D1D Include list
-MANWORKS_INCLUDE = -I$(MANWORKS_INC_DIR) -I$(GETFEM_INC_DIR)
+MANWORKS_INCLUDE = -I$(MANWORKS_INC_DIR) -I$(GETFEM_INC_DIR) 
 # Specific Linear M3D1D Library list
 MANWORKS_LIBRARY = -L$(GETFEM_LIB_DIR) -lgetfem
 # Specific Curved M3D1D Include list
