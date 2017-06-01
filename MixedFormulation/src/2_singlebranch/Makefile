@@ -12,39 +12,39 @@
 #   DATE        : April 2015
 # ====================================================================
 
-include ../../config.mk
+include ../../../Makefile.inc
 
-CPPFLAGS=-I../../include -I$(GETFEM_PREFIX)/include
-CXXFLAGS=-std=c++11 -D=M3D1D_VERBOSE_
+mCPPFLAGS=-I../../include -I$(mkGetFEMHome)/include
+mCXXFLAGS=-std=c++11 -D=M3D1D_VERBOSE_
 ifeq ($(DEBUG),yes)
-  OPTFLAGS=-g -Wall
+  mOPTFLAGS=-g -Wall
 else
-  OPTFLAGS=-O3 -march=native
-  CPPFLAGS+=-DNDEBUG
+  mOPTFLAGS=-O3 -march=native
+  mCPPFLAGS+=-DNDEBUG
 endif
-LDFLAGS=-L../../lib -L$(GETFEM_PREFIX)/lib
-LIBRARIES=-lproblem3d1d -lgetfem
+mLDFLAGS=-L../../lib -L$(mkGetFEMHome)/lib
+mLIBRARIES=-lproblem3d1d -lgetfem
 
-SRCS=$(wildcard *.cpp)
-OBJS=$(SRCS:.cpp=.o)
-EXEC=M3D1D
+mSRCS=$(wildcard *.cpp)
+mOBJS=$(SRCS:.cpp=.o)
+mEXEC=M3D1D
 
-OUTDIR=vtk
+mOUTDIR=vtk
 
 .PHONY: all clean distclean
 
-all: $(EXEC)
+all: $(mEXEC)
 	@echo
 	@echo Compilation completed!
 
 %.o: %.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) -o $@ -c $<
+	$(CXX) $(mCPPFLAGS) $(mCXXFLAGS) $(mOPTFLAGS) -o $@ -c $<
 
-$(EXEC): $(OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LIBRARIES)
+$(EXEC): $(mOBJS)
+	$(mCXX) $(mLDFLAGS) -o $@ $(mOBJS) $(mLIBRARIES)
 
 clean:
-	$(RM) $(OBJS) $(EXEC) *~ *.log
+	$(RM) $(mOBJS) $(mEXEC) *~ *.log
 
 distclean: clean
-	$(RM) *.txt $(OUTDIR)/*
+	$(RM) *.txt $(mOUTDIR)/*

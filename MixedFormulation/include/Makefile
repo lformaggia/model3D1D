@@ -12,19 +12,19 @@
 #   DATE        : February 2016
 # ====================================================================
 
-include ../config.mk
+include ../../Makefile.inc
 
-CPPFLAGS=-I. -I$(GETFEM_PREFIX)/include
+CPPFLAGS=-I. -I$(mkGetFEMHome)/include
 CXXFLAGS=-std=c++11
 OPTFLAGS=-O3 -DNDEBUG -march=native
 
-LIBDIR=../lib
-LIBNAME=problem3d1d
-LIBFILE=lib$(LIBNAME).a
+mLIBDIR=../lib
+mLIBNAME=problem3d1d
+mLIBFILE=lib$(mLIBNAME).a
 
-LIBSRC=$(wildcard *.cpp)
-LIBOBJS=$(LIBSRC:.cpp=.o)
-LIBHEADERS=$(wildcard *.hpp)
+mLIBSRC=$(wildcard *.cpp)
+mLIBOBJS=$(mLIBSRC:.cpp=.o)
+mLIBHEADERS=$(wildcard *.hpp)
 
 .PHONY: all clean distclean library
 
@@ -32,15 +32,15 @@ all: library
 	@echo
 	@echo Library installed!
 
-library: $(LIBOBJS)
-	install -d $(LIBDIR)
-	ar -r $(LIBDIR)/$(LIBFILE) $(LIBOBJS)
+library: $(mLIBOBJS)
+	install -d $(mLIBDIR)
+	ar -r $(mLIBDIR)/$(mLIBFILE) $(mLIBOBJS)
 
 %.o: %.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) -o $@ -c $<
+	$(CXX) $(mCPPFLAGS) $(mCXXFLAGS) $(mOPTFLAGS) -o $@ -c $<
 
 clean:
-	$(RM) $(LIBOBJS) *~
+	$(RM) $(mLIBOBJS) *~
 
 distclean: clean
-	$(RM) $(LIBDIR)/$(LIBFILE)
+	$(RM) $(mLIBDIR)/$(mLIBFILE)
