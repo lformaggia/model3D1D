@@ -22,9 +22,12 @@ all:
 	make -C src/1_LinearSingleBranch
 	make -C src/2_CurvedSingleBranch
 	make -C src/3_LinearBifurcation
+	make -C src/4b_CurvedBifurcation
 	make -C src/4_CurvedBifurcation
 	make -C src/5_LinearRombus
 	make -C src/6_CurvedRombus
+	make -C src/6b_Cirvcular_Rombus
+
 
 library:
 	make -C include
@@ -42,8 +45,10 @@ clean:
 	make clean -C src/2_CurvedSingleBranch
 	make clean -C src/3_LinearBifurcation
 	make clean -C src/4_CurvedBifurcation
+	make clean -C src/4b_CurvedBifurcation
 	make clean -C src/5_LinearRombus
 	make clean -C src/6_CurvedRombus
+	make clean -C src/6b_Cirvcular_Rombus
 
 distclean: clean
 	$(RM) -r doc/*
@@ -53,6 +58,7 @@ distclean: clean
 	make distclean -C src/2_CurvedSingleBranch
 	make distclean -C src/3_LinearBifurcation
 	make distclean -C src/4_CurvedBifurcation
+	make distclean -C src/4b_CurvedBifurcation
 	make distclean -C src/5_LinearRombus
 	make distclean -C src/6_CurvedRombus
 
