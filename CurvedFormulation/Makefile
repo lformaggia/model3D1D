@@ -26,7 +26,7 @@ all:
 	make -C src/4_CurvedBifurcation
 	make -C src/5_LinearRombus
 	make -C src/6_CurvedRombus
-	make -C src/6b_Cirvcular_Rombus
+	make -C src/6b_Circular_Rombus
 
 
 library:
@@ -48,7 +48,7 @@ clean:
 	make clean -C src/4b_CurvedBifurcation
 	make clean -C src/5_LinearRombus
 	make clean -C src/6_CurvedRombus
-	make clean -C src/6b_Cirvcular_Rombus
+	make clean -C src/6b_Circular_Rombus
 
 distclean: clean
 	$(RM) -r doc/*
@@ -61,4 +61,4 @@ distclean: clean
 	make distclean -C src/4b_CurvedBifurcation
 	make distclean -C src/5_LinearRombus
 	make distclean -C src/6_CurvedRombus
-
+	make distclean -C src/6b_Circular_Rombus

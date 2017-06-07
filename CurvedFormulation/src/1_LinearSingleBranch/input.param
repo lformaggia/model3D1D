@@ -106,3 +106,6 @@ BETA = 1.0E-10
 Max_iter=20;
 % Min incremental error for convergence of the fixed point method
 minERR= 0.001;
+
+
+
