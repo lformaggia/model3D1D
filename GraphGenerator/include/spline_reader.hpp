@@ -46,6 +46,7 @@ class B_reader_netdiff : public BGLgeom::reader_ASCII	<NetDiff::Vertex_prop,
 			this->in_file >> BC_src >> BC_tgt>>dim_cp>>dim_mesh>> SRC >> TGT;
 			points PTS;
 			CP.push_back(SRC);
+
 			for(unsigned int i=2; i<dim_cp;i++){
 				this->in_file>>PTS;
 				CP.push_back(PTS);

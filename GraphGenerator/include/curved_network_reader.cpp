@@ -15,6 +15,7 @@
  */    
  /*! @defgroup graph reader routines */
 #include "curved_network_reader.hpp"
+#include "graph_builder.hpp"
 
 namespace NetDiff{
 
@@ -34,10 +35,9 @@ void curved_reader(int argc, char *argv[]){
 		_type=BSP_type::Interp;
 	else
 		_type=BSP_type::Approx;
-
+   
 	Graph G;
 	B_reader_netdiff R(in_filename);
-	
 	// Utilities to read the data and build the graph
 	Vertex_prop src_prop, tgt_prop;
 	//Edge_prop e_prop;
@@ -46,7 +46,7 @@ void curved_reader(int argc, char *argv[]){
 	vect_pts CP;
 	vector<unsigned int> Mesh_dim;
 	unsigned int count = 0;
-	
+	std::cout<<"Starting reading the inputfile"<<std::endl;
 	// Reading the file
 	while(!R.is_eof()){
 		// Reading data
@@ -58,7 +58,12 @@ void curved_reader(int argc, char *argv[]){
 		tgt = new_vertex(tgt_prop, G);
 		CP = R.get_control_points();
 		Mesh_dim.push_back(R.get_mesh_dimension());
+		for(int i=0;i<CP.size();i++){
+			std::cout<<"Point "<<i<<" = "<<CP[i]<<endl;
+		}
+		std::cout<<"Problema nella generazione della b_spline\n";
 		e = new_bspline_edge<Graph,3>(src, tgt,CP,_type, G);
+		std::cout<<"Generating Branch "<<count<<std::endl;
 		G[e].index = count;
 		count++;
 	}
@@ -73,7 +78,8 @@ void curved_reader(int argc, char *argv[]){
 	// Writing on a pts output
 	std::string out_pts_filename=PARAM.string_value("OUTPUT_PTS","Pass the output file name for the graph");
 	writer_pts<Graph,3> W(out_pts_filename);
-	W.export_pts(G);	
+	W.export_pts(G,true);	
+	
 }
 
 

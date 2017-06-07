@@ -5,11 +5,12 @@ include ../../Makefile.inc
 
 LDFLAGS= -L/home/pacs_student/model3D1D/GraphGenerator/lib  $(GRAPH_LIBRARY_DIR)
 LIB= -lgraphgenerator $(GRAPH_LIBRARY)
-.PHONY= help all exec clean distclean
+EXEC=main
+.PHONY= help all clean distclean run
 
 .DEFAUL_GOAL: all
 
-all: exec clean distclean
+all: $(EXEC)
 
 help:
 	@echo "make help: ----- Prints this help"
@@ -19,11 +20,13 @@ help:
 main.o: main.cpp
 	$(CXX) $(STDFLAG) $(GRAPH_INCLUDE) $(OPTFLAGS) $(WARNREAD)  -o main.o -c main.cpp
 
-exec: main.o
-	$(CXX)  $(LDFLAGS)  -o main main.o $(LIB)
+ $(EXEC): main.o
+	$(CXX)  $(LDFLAGS)  -o $(EXEC) main.o $(LIB)
 
+run:  $(EXEC)
+	./main input.param
 clean:
 	$(RM) $(LIBOBJS) *~
 
 distclean: clean
-	$(RM) main
+	$(RM) main *.pts
