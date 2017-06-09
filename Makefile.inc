@@ -69,11 +69,11 @@ GRAPH_LIB_DIR      = $(PROJECT_DIR)/GraphGenerator/lib
 
 
 # Specific Graph Generator Include list
-GRAPH_INCLUDE = -I$(GRAPH_INC_DIR) -I$(BGLGEOM_INC_DIR) -I$(EIGEN_INC) -I$(GETFEM_INC_DIR) -I$(C_MANWORKS_INC_DIR) -I$(MANWORKS_INC_DIR) -I$(BGL_NETW_INC) -I$(VTK_INC_DIR)
+GRAPH_INCLUDE = -I$(GRAPH_INC_DIR) -I$(BGLGEOM_INC_DIR) -I$(EIGEN_INC) -I$(GETFEM_INC_DIR)  -I$(BGL_NETW_INC) -I$(VTK_INC_DIR)
 # Specific Graph Generator Library list (for test case)
-GRAPH_LIBRARY = -lBGLgeom -lc_problem3d1d -lproblem3d1d -lgetfem $(foreach lib, $(VTK_LIBS), -l$(lib))
+GRAPH_LIBRARY = -lBGLgeom -lgetfem $(foreach lib, $(VTK_LIBS), -l$(lib))
 # Specific Graph Generator Library directory
-GRAPH_LIBRARY_DIR = -L$(BGLGEOM_LIB_DIR) -L$(MANWORKS_LIB_DIR) -L$(GETFEM_LIB_DIR) -L$(C_MANWORKS_LIB_DIR) -L$(VTK_LIB_DIR)
+GRAPH_LIBRARY_DIR = -L$(BGLGEOM_LIB_DIR) -L$(GETFEM_LIB_DIR)  -L$(VTK_LIB_DIR)
 # Specific Linear M3D1D Include list
 MANWORKS_INCLUDE = -I$(MANWORKS_INC_DIR) -I$(GETFEM_INC_DIR) 
 # Specific Linear M3D1D Library list

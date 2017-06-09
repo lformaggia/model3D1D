@@ -7,7 +7,10 @@ LIBDIR= $(C_MANWORK_LIBRARY_DIR) -L$(C_MANWORKS_LIB_DIR)
 
 .DEFAUL_GOAL: all
 
-all: main help
+all: main
+	@echo 
+	@echo "4b_CurvedBifurcation test case compiled"
+	@echo
 
 help:
 	@echo "make help: ------- Prints this help"

@@ -106,7 +106,7 @@ asm_network_nonlinear_junctions
 
 		dofi=mf_ui[i].nb_dof();
 		scalar_type Ri = simple_compute_radius(mim, mf_data, radius, i);
-		scalar_type Gi = G[0]; // Dynamic pressure gain term
+		scalar_type Gi = simple_compute_radius(mim, mf_data, G,i); // Dynamic pressure gain term
 		scalar_type ki_s= k[i][0]; //Curvature at the beginning of the branch
 		scalar_type ki_e= k[i].back(); //Curvature at the end of the branch
 		scalar_type ui_s= u_old[shift]; //Velocity at the previous Iteration at the beginning of the branch

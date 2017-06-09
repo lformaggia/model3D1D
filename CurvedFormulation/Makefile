@@ -12,7 +12,7 @@
 #  @date   May 2017.
 #
 #======================================================================    
-.PHONY= all clean distclean doc pdf library
+.PHONY= all clean distclean doc pdf library help
 .DEFAULT_GOAL=all
 
 
@@ -28,6 +28,14 @@ all:
 	make -C src/6_CurvedRombus
 	make -C src/6b_Circular_Rombus
 
+help:
+	@echo "make all:------ build the library and complile the test case"
+	@echo "make help: ---- prints help comands"
+	@echo "make library:-- build the static library"
+	@echo "make doc:------ build doxigen file"
+	@echo "make pdf:------ create pdf file with documentation"
+	@echo "make clean:---- clean all objects"
+	@echo "make distclean: clean all object, libraries, doc file and executables"
 
 library:
 	make -C include

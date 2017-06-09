@@ -14,8 +14,9 @@ all: $(EXEC)
 
 help:
 	@echo "make help: ----- Prints this help"
-	@echo "make all: ------ "
+	@echo "make all: ------ Complile all object and link libraries"
 	@echo "make clean: ---- Cleans all object files"
+	@echo "make distclean:- Cleans all object and executables"
 
 main.o: main.cpp
 	$(CXX) $(STDFLAG) $(GRAPH_INCLUDE) $(OPTFLAGS) $(WARNREAD)  -o main.o -c main.cpp
@@ -24,6 +25,7 @@ main.o: main.cpp
 	$(CXX)  $(LDFLAGS)  -o $(EXEC) main.o $(LIB)
 
 run:  $(EXEC)
+	install -d vtk
 	./main input.param
 clean:
 	$(RM) $(LIBOBJS) *~

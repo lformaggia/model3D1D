@@ -12,10 +12,20 @@
 #   DATE        : Maggio 2017
 # ====================================================================
 
-.PHONY: all doc pdf clean distclean library exec 
+.PHONY: all doc pdf clean distclean library exec help
+
 
 all: library
 	$(MAKE) -C src/SingleBranch
+
+help:
+	@echo "make all:------ compile and create static library, and create executables"
+	@echo "make help:----- print help"
+	@echo "make doc:------ create doxigen file for documentation"
+	@echo "make pdf:------ create doxigen file for documentation and pdf file"
+	@echo "make exec:----- create in src/ the executable a run it "
+	@echo "make clean:---- delete all object files"
+	@echo "make distclean: delete all object files, library, executables and documentation"
 
 library: 
 	$(MAKE) -C include
@@ -29,7 +39,7 @@ pdf: doc
 	
 exec: all
 	makedir vtk -C src/SingleBranch
-	./M3D1D input.param
+	./src/SingleBranch/M3D1D src/SingleBranch/input.param
 
 pdf: doc
 	$(MAKE) -C doc/latex pdf

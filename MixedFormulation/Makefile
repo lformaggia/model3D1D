@@ -12,7 +12,7 @@
 #   DATE        : November 2015
 # ====================================================================
 
-.PHONY: all doc clean distclean library
+.PHONY: all doc clean distclean library help
 
 all: library
 	$(MAKE) -C src/1_uncoupled
@@ -20,6 +20,15 @@ all: library
 	$(MAKE) -C src/3_Ybifurcation
 	$(MAKE) -C src/4_primalmixed
 	$(MAKE) -C src/5_CSF
+
+help:
+	@echo "make all: build the library and complile the test case"
+	@echo "make help: prints help comands"
+	@echo "make library: build the static library"
+	@echo "make clean: clean all objects"
+	@echo "make distclean: clean all object, libraries, doc file and executables"
+
+
 
 library: 
 	$(MAKE) -C include
