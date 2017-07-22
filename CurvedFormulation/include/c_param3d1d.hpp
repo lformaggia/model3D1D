@@ -78,7 +78,7 @@ struct c_param3d1d : public param3d1d {
 		bool IMPORT_RADIUS = FILE_.int_value("IMPORT_RADIUS");
 		bool NONDIM_PARAM  = FILE_.int_value("TEST_PARAM");
 		bool EXPORT_PARAM  = FILE_.int_value("EXPORT_PARAM");
-		bool IMPORT_CURVE = FILE_.int_value("IMPORT_CURVE");
+		bool IMPORT_CURVE = FILE_.int_value("CURVE_PROBLEM");
 
 		
 		#ifdef M3D1D_VERBOSE_

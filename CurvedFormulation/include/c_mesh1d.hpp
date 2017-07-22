@@ -88,6 +88,7 @@
 
 #include <node.hpp>
 #include <defines.hpp>
+#include <cmath>
 
 namespace getfem {
 
@@ -408,7 +409,245 @@ void rasm_curve_parameter(
 	}
 }
 
+/*! 
+	Fuction to Compute the curvature given 3 nodes
+	K=4*Apar/(d(x,y)*d(y,z)*d(z,x))
+*/
+template<typename Point3d>
+scalar_type
+curvature3d(
+	Point3d & X,
+	Point3d & Y,
+	Point3d & Z
+	)
+{
 
+	scalar_type dXY,dYZ, dZX , K;
+	scalar_type A=0.0;
+	vector_type XY(3);
+	vector_type XZ(3);
+	
+	//compute distance of Points
+	dXY=sqrt((X[1]-Y[1])*(X[1]-Y[1])+(X[2]-Y[2])*(X[2]-Y[2])+(X[3]-Y[3])*(X[3]-Y[3]));
+	dYZ=sqrt((Z[1]-Y[1])*(Z[1]-Y[1])+(Z[2]-Y[2])*(Z[2]-Y[2])+(Z[3]-Y[3])*(Z[3]-Y[3]));
+	dZX=sqrt((X[1]-Z[1])*(X[1]-Z[1])+(X[2]-Z[2])*(X[2]-Z[2])+(X[3]-Z[3])*(X[3]-Z[3]));
+
+	//Compute Area of the parallelogram
+	for(int i=0;i<3;i++){
+		XY[i]=Y[i]-X[i];
+		XZ[i]=Z[i]-X[i];
+	}
+
+	for(int i=0; i<3;i++){
+		A=A+(XY[i]*XZ[(i+1)%3]-XY[(i+1)%3]*XZ[i]);
+	}
+	A=A/2.0;
+
+	//Compute Curvature
+	K=4.0*A/dXY/dYZ/dZX;
+	return K;
+}
+
+
+/*!
+	Import the network points from the file of points(pts), compute the curve parameters and build the mesh.
+
+	\ingroup geom
+ */
+//! \note It also build vessel mesh regions (#=0 for branch 0, #=1 for branch 1, ...).
+template<typename VEC, typename PARAM>
+void 
+import_pts_file(
+		std::istream & ist, 
+		getfem::mesh & mh1D, 
+		std::vector<getfem::node> &  BCList,
+		VEC & Nn,
+		const std::string & MESH_TYPE,
+		PARAM & param
+		) 
+{
+
+	size_type Nb = 0; // nb of branches
+	Nn.resize(0); Nn.clear();
+	mh1D.clear();
+	
+	ist.precision(16);
+	ist.seekg(0); ist.clear();
+	GMM_ASSERT1(bgeot::read_until(ist, "BEGIN_LIST"), 
+		"This seems not to be a data file");
+
+
+	vector<vector_type> lx;
+	vector<vector_type> ly;
+	vector<vector_type> lz;
+	vector<vector_type> Curv;
+
+	size_type globalBoundaries = 0;
+
+	while (bgeot::read_until(ist, "BEGIN_ARC")) {
+	
+		Nb++;
+		Nn.emplace_back(0);
+
+		std::vector<base_node> lpoints; 
+		vector_type Curv_b;
+		vector_type lx_b;
+		vector_type ly_b;
+		vector_type lz_b;
+		//temporary value used to compute euclidean norm
+		scalar_type lx_t;
+		scalar_type ly_t;
+		scalar_type lz_t;
+		scalar_type lmod;
+
+		dal::dynamic_array<scalar_type> tmpv;
+		std::string tmp, BCtype, value;
+		bool thend = false; 
+		size_type bcflag = 0;
+		size_type bcintI = 0, bcintF = 0;
+		node BCA, BCB;
+
+		// Read an arc from data file and write to lpoints
+		while (!thend) {
+			bgeot::get_token(ist, tmp, 1023);
+			if (tmp.compare("END_ARC") == 0) { 
+				thend = true;
+			}
+			else if (ist.eof()) {
+				GMM_ASSERT1(0, "Unexpected end of stream");
+			}
+			else if (tmp.compare("BC") == 0) { 
+				bcflag++;
+				bgeot::get_token(ist, BCtype, 4);
+				if (BCtype.compare("DIR") == 0) {
+					bgeot::get_token(ist, value, 1023);
+					if (bcflag == 1) {
+						BCA.label = BCtype; 
+						BCA.value = stof(value); 
+						//BCA.ind = globalBoundaries;
+						globalBoundaries++;
+					}
+					else if (bcflag == 2) {
+						BCB.label = BCtype; 
+						BCB.value = stof(value); 
+						//BCB.ind = globalBoundaries;
+						globalBoundaries++;
+					}
+					else
+						GMM_ASSERT1(0, "More than 2 BC found on this arc!");
+				}
+				else if (BCtype.compare("MIX") == 0) {
+					bgeot::get_token(ist, value, 1023);
+					if (bcflag == 1) {
+						BCA.label = BCtype; 
+						BCA.value = stof(value); 
+						//BCA.ind = globalBoundaries;
+						globalBoundaries++;
+					}
+					else if (bcflag == 2) {
+						BCB.label = BCtype; 
+						BCB.value = stof(value); 
+						//BCB.ind = globalBoundaries;
+						globalBoundaries++;
+					}
+				}
+				else if (BCtype.compare("INT") == 0) {
+					if (bcflag == 1) {
+						bcintI++;
+						BCA.label = BCtype; 
+						//BCA.value = stof(value); //Error: no number to read
+					}
+					else if (bcflag == 2) {
+						bcintF++;
+						BCB.label = BCtype; 
+						//BCB.value = stof(value); //Error: no number to read
+					}
+					else
+						GMM_ASSERT1(0, "More than 2 BC found on this arc!");
+				}
+				else
+					GMM_ASSERT1(0, "Unknown Boundary condition");	  
+			
+			} /* end of "BC" case */
+			else if (tmp.size() == 0) {
+				GMM_ASSERT1(0, "Syntax error in file, at token '" 
+							 << tmp << "', pos=" << std::streamoff(ist.tellg()));
+			} 
+			else { /* "point" case */
+				Nn[Nb-1]++;
+				int d = 0;
+				while ( (isdigit(tmp[0]) != 0) || tmp[0] == '-' || tmp[0] == '+' || tmp[0] == '.'){ 
+					tmpv[d++] = stof(tmp); 
+					bgeot::get_token(ist, tmp, 1023); 
+				}
+				if (d != 4) GMM_ASSERT1(0, "Points must have 3 coordinates");
+				base_node tmpn(tmpv[1], tmpv[2], tmpv[3]);
+				lpoints.push_back(tmpn);
+				if (tmp.compare("END_ARC") == 0) { thend = true; Nn[Nb-1]--; }
+			} 
+						
+		} /* end of inner while */
+		
+		// Insert the arc into the 1D mesh and build a new region for the corresponding branch
+		// Check validity of branch region
+		GMM_ASSERT1(mh1D.has_region(Nb-1)==0, "Overload in meshv region assembling!");
+		scalar_type KK=0;
+		for (size_type i=0; i<lpoints.size()-1; ++i ) {
+			std::vector<size_type> ind(2);
+			size_type ii = (i==0) ? 0 : i+1;
+			size_type jj;
+			size_type ll= (i==1) ? 0 : i;
+
+			if (ii == lpoints.size()-1) jj = 1;
+			else if (ii == 0) jj = 2;
+			else jj = ii+1;
+			
+			ind[0] = mh1D.add_point(lpoints[ii]);
+			ind[1] = mh1D.add_point(lpoints[jj]);
+			size_type cv;
+			cv = mh1D.add_convex(bgeot::geometric_trans_descriptor(MESH_TYPE), ind.begin());
+		
+			// Build branch regions
+			mh1D.region(Nb-1).add(cv);
+			
+			if ((bcflag>0) && (ii==0)&& (bcintI==0)) {
+				BCA.idx = ind[0];
+				BCList.push_back(BCA);
+			}
+			if ((bcflag>1) && (jj==1) && (bcintF==0)) {
+				BCB.idx = ind[1];
+				BCList.push_back(BCB);
+			}
+
+			//Compute Curvature
+			if(ii!=0 ){
+				KK=curvature3d(lpoints[ll],lpoints[ii],lpoints[jj]);
+				if(ii==2){
+					Curv_b.push_back(KK);
+				}
+				Curv_b.push_back(KK);
+				if(ii==lpoints.size()-1){
+					Curv_b.push_back(KK);
+				}
+			}
+
+			//Compute Tanget Versor
+			lx_t=lpoints[jj][0]-lpoints[ii][0];
+			ly_t=lpoints[jj][1]-lpoints[ii][1];
+			lz_t=lpoints[jj][2]-lpoints[ii][2];
+			lmod=sqrt(lx_t*lx_t+ly_t*ly_t+lz_t*lz_t);
+
+			lx_b.push_back(lx_t/lmod);
+			ly_b.push_back(ly_t/lmod);
+			lz_b.push_back(lz_t/lmod);
+		} /* end of inner for */
+		Curv.push_back(Curv_b);
+		lx.push_back(lx_b);
+		ly.push_back(ly_b);
+		lz.push_back(lz_b);
+	} /* end of outer while */	
+	param.get_curve(Curv,lx,ly,lz);//Saving the parameters
+} /* end of import_pts_file */
 
 } /* end of namespace */
 #endif

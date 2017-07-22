@@ -45,11 +45,11 @@ c_problem3d1d::import_data(void)
 	cout << "Importing descriptors for tissue and vessel problems ..." << endl;
 	#endif
 	descr.import(PARAM);
-	if(PARAM.int_value("IMPORT_CURVE"))
+	if(PARAM.int_value("CURVE_PROBLEM"))
 		c_descr.import(PARAM);
 	#ifdef M3D1D_VERBOSE_
 	cout << descr;
-	if(PARAM.int_value("IMPORT_CURVE"))
+	if(PARAM.int_value("CURVE_PROBLEM"))
 		cout << c_descr;
 	#endif
 }
@@ -85,8 +85,15 @@ c_problem3d1d::build_mesh(void)
 	std::ifstream ifs(descr.MESH_FILEV);
 	GMM_ASSERT1(ifs.good(), "impossible to read from file " << descr.MESH_FILEV);
 	bool Import=PARAM.int_value("IMPORT_CURVE");
+	bool Curve=PARAM.int_value("CURVE_PROBLEM");
 
-	if(Import){
+	if(Curve && !Import){
+		import_pts_file(ifs, meshv, BCv, nb_vertices, descr.MESH_TYPEV,c_param);
+	}
+	else if(Import && !Curve){
+		GMM_ASSERT1(0,"If you want to import the curvature, you need to enable CURVE_PROBLEM=1");
+	}
+	else if(Import && Curve){
 		std::ifstream ifc(PARAM.string_value("CURVE_FILE","curvature file location"));
 		GMM_ASSERT1(ifc.good(), "impossible to read from file " << PARAM.string_value("CURVE_FILE","curvature file location"));
 		

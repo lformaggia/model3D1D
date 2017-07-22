@@ -20,7 +20,9 @@ TEST_PARAM = 1;
 IMPORT_RADIUS = 1;
 % Flag to export results
 VTK_EXPORT = 1;
-% Flag to import the curve file
+% Flag to enable the curve model
+CURVE_PROBLEM = 0;
+% Flag to import the curve file (Remember to ENABLE CURVE_PROBLEM)
 IMPORT_CURVE = 1;
 % Flag to use Newton Fixed Point Method
 Newton = 1;
